@@ -54,8 +54,11 @@ PerformanceCPUView::PerformanceCPUView(MainWindow *window, PerformanceButton *bu
             m_FlowNumThreads.set_text(std::to_string(ProcessesApi::GetNumThreads()));
 
             auto uptimeMs = SystemInfoApi::GetUptimeMS();
-            std::chrono::time_point<std::chrono::system_clock> time((std::chrono::milliseconds(uptimeMs)));
-            m_FlowUptime.set_text(fmt::format("{:%T}", time));
+            auto time = std::chrono::milliseconds(uptimeMs);
+            m_FlowUptime.set_text(Utils::formatDuration<std::chrono::milliseconds,
+                    std::chrono::hours,
+                    std::chrono::minutes,
+                    std::chrono::seconds>(time));
 
             m_Button->AddGraphPoint(cpuUsageTotal);
 

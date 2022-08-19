@@ -19,6 +19,16 @@ public:
         return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     }
 
+    template<class DurationIn, class FirstDuration, class...RestDurations>
+    static std::string formatDuration(DurationIn d) {
+        auto val = std::chrono::duration_cast<FirstDuration>(d);
+        auto out = fmt::format("{:#02d}", val.count());
+        if constexpr(sizeof...(RestDurations) > 0) {
+            out += ":" + formatDuration<DurationIn, RestDurations...>(d - val);
+        }
+        return out;
+    }
+
     template<typename T>
     static bool vectorContains(const std::vector<T>& vec, T val) {
         auto found = std::find_if(vec.begin(), vec.end(),[&](T type) -> bool { return type == val; });

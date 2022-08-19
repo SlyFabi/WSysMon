@@ -22,7 +22,10 @@ int DiskApi::GetNumDisks() {
 
     int count = 0;
     for (const auto& dirEntry : std::filesystem::directory_iterator("/sys/block")) {
-        if(Utils::stringStartsWith(dirEntry.path().stem(), "loop") || Utils::stringStartsWith(dirEntry.path().stem(), "zram"))
+        if(!Utils::stringStartsWith(dirEntry.path().stem(), "sd")
+        && !Utils::stringStartsWith(dirEntry.path().stem(), "hd")
+        && !Utils::stringStartsWith(dirEntry.path().stem(), "md")
+        && !Utils::stringStartsWith(dirEntry.path().stem(), "nvme"))
             continue;
 
         g_DiskMap[count] = dirEntry.path().string();
