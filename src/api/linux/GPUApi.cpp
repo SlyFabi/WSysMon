@@ -63,6 +63,13 @@ double GPUApi::GetGPUUsagePercent(int gpuId) {
     return nvInfo.value().devinfos[gpuId].utilization.gpu;
 }
 
+double GPUApi::GetGPUTemperature(int gpuId) {
+    auto nvInfo = NvGpuApi::GetInfo();
+    if(nvInfo == std::nullopt)
+        return 0;
+    return nvInfo.value().devinfos[gpuId].gpuTemperature;
+}
+
 GPUProcessInfo GPUApi::GetGPUProcessInfo(nvgpu_info_t nvidiaInfo, int gpuId, int pid) {
     auto nvGpu = nvidiaInfo.devinfos[gpuId];
     for(auto proc : nvGpu.gpu_processinfos)

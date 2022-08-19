@@ -19,6 +19,10 @@ PerformanceCPUView::PerformanceCPUView(MainWindow *window, PerformanceButton *bu
     AddFlowDetail("Threads", m_FlowNumThreads);
     AddFlowDetail("Uptime", m_FlowUptime);
 
+    auto tempEnabled = SystemInfoApi::GetCPUTemperature() > 0;
+    if(tempEnabled)
+        AddFlowDetail("Temperature", m_FlowTemperature);
+
     AddDetail("Maximum CPU speed:", m_DetailMaxCpuSpeed);
     AddDetail("Sockets:", m_DetailNumSockets);
     AddDetail("Cores:", m_DetailNumCores);
@@ -43,7 +47,7 @@ PerformanceCPUView::PerformanceCPUView(MainWindow *window, PerformanceButton *bu
     m_UpdateThread = new DispatcherThread([this]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             m_UpdateThread->Dispatch();
-        }, [this]() {
+        }, [this, tempEnabled]() {
             auto cpuUsageTotal = SystemInfoApi::GetCPUUsagePercent();
             double cpuClockGhz = (double)SystemInfoApi::GetCPUClock() / 1000000000.;
             m_Button->SetInfoText(fmt::format("{:.0f}%, {:.2f}GHz", cpuUsageTotal, cpuClockGhz));
@@ -52,6 +56,12 @@ PerformanceCPUView::PerformanceCPUView(MainWindow *window, PerformanceButton *bu
             m_FlowCpuSpeed.set_text(fmt::format("{:.2f}GHz", cpuClockGhz));
             m_FlowNumProcesses.set_text(std::to_string(ProcessesApi::GetNumProcesses()));
             m_FlowNumThreads.set_text(std::to_string(ProcessesApi::GetNumThreads()));
+
+            if(tempEnabled) {
+                auto tempStr = fmt::format("{:.0f}°C", SystemInfoApi::GetCPUTemperature());
+                m_FlowTemperature.set_text(tempStr);
+                m_Button->SetInfoText2(tempStr);
+            }
 
             auto uptimeMs = SystemInfoApi::GetUptimeMS();
             auto time = std::chrono::milliseconds(uptimeMs);

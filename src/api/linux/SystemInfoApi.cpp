@@ -1,9 +1,11 @@
 #include "../SystemInfoApi.h"
+#include "../HwMonApi.h"
 #include <unistd.h>
 
 #define KiB_TO_B 1024
 
 std::map<int, CPUTimes> SystemInfoApi::m_CpuUsageDeltas;
+std::optional<std::string> SystemInfoApi::m_CpuTempPath;
 
 long SystemInfoApi::GetTotalRam() {
     return ReadNamedEntry("/proc/meminfo", "MemTotal") * KiB_TO_B;
@@ -115,6 +117,31 @@ long SystemInfoApi::GetCPUClock(int cpuId) {
 long SystemInfoApi::GetMaxCPUClock() {
     auto maxFreqStr = IOUtils::ReadAllText("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
     return Utils::stringToLong(maxFreqStr) * 1000;
+}
+
+double SystemInfoApi::GetCPUTemperature() {
+    if(!m_CpuTempPath.has_value()) {
+        std::string tempPath{};
+        for(int i = 0; i < HwMonApi::GetNumDevices(); i++) {
+            auto name = HwMonApi::GetDeviceName(i);
+            if(name == "k10temp" || name == "zenpower") {
+                tempPath = HwMonApi::FindInputPath(i, "Tdie");
+                if(tempPath.empty())
+                    tempPath = HwMonApi::FindInputPath(i, "Tctl");
+                break;
+            } else if(name == "coretemp") {
+                tempPath = HwMonApi::FindInputPath(i, "Package id 0");
+                break;
+            }
+        }
+        m_CpuTempPath = tempPath;
+    }
+
+    if(!m_CpuTempPath.value().empty()) {
+        auto tempStr = IOUtils::ReadAllText(m_CpuTempPath.value());
+        return Utils::stringToDouble(tempStr) / 1000.;
+    }
+    return 0;
 }
 
 std::string SystemInfoApi::GetCPUName() {

@@ -22,6 +22,7 @@ public:
 
     static long GetGPUClock(int gpuId);
     static double GetGPUUsagePercent(int gpuId);
+    static double GetGPUTemperature(int gpuId);
 
     static GPUProcessInfo GetGPUProcessInfo(nvgpu_info_t nvidiaInfo, int gpuId, int pid);
 

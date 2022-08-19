@@ -96,6 +96,10 @@ enum nvmlClockType_t {
     NVML_CLOCK_VIDEO = 3
 };
 
+enum nvmlTemperatureSensors_t {
+    NVML_TEMPERATURE_GPU = 0
+};
+
 // NVML Function pointer typedefs
 #define HOOK_FUNC( _ret, _reterr, _func, _args, ... ) typedef _ret ( _func ## _t )( __VA_ARGS__ );
 #include "nvml_hook_funcs.inl"

@@ -21,6 +21,7 @@ typedef struct nvgpu_devinfo_st
     char name[ 80 ] = { 0 };
     unsigned int videoClock;
     unsigned int memoryClock;
+    unsigned int gpuTemperature;
 
     nvmlBAR1Memory_t bar1mem = {};
     nvmlMemory_t meminfo = {};

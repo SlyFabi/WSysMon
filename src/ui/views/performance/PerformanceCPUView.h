@@ -18,6 +18,7 @@ private:
     Gtk::Label m_FlowNumProcesses;
     Gtk::Label m_FlowNumThreads;
     Gtk::Label m_FlowUptime;
+    Gtk::Label m_FlowTemperature;
 
     Gtk::Label m_DetailMaxCpuSpeed;
     Gtk::Label m_DetailNumSockets;

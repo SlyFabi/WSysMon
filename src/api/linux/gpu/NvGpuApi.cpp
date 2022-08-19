@@ -137,6 +137,7 @@ nvmlReturn_t nvgpu_get_info(const nvml_functions_t &nvmlfuncs, nvgpu_info_t &nvg
                 NVML_CALL(ret, nvmlDeviceGetUtilizationRates, nvmldev, &devinfo.utilization);
                 NVML_CALL(ret, nvmlDeviceGetBAR1MemoryInfo, nvmldev, &devinfo.bar1mem);
                 NVML_CALL(ret, nvmlDeviceGetMemoryInfo, nvmldev, &devinfo.meminfo);
+                NVML_CALL(ret, nvmlDeviceGetTemperature, nvmldev, nvmlTemperatureSensors_t::NVML_TEMPERATURE_GPU, &devinfo.gpuTemperature);
 
                 nvgpu_get_process_info(nvmlfuncs, nvmldev, devinfo.gpu_processinfos, false);
                 nvgpu_get_process_info(nvmlfuncs, nvmldev, devinfo.compute_processinfos, true);

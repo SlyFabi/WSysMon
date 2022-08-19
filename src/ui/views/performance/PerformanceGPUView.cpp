@@ -22,6 +22,7 @@ PerformanceGPUView::PerformanceGPUView(MainWindow *window, PerformanceButton *bu
     AddFlowDetail("Usage", m_FlowGpuUsage);
     AddFlowDetail("Speed", m_FlowGpuClock);
     AddFlowDetail("Video memory", m_FlowGpuMemory);
+    AddFlowDetail("Temperature", m_FlowGpuTemperature);
 
     AddDetail("Driver", m_DetailDriver);
     m_DetailDriver.set_text(GPUApi::GetGPUDriverString(m_GpuId));
@@ -48,6 +49,10 @@ PerformanceGPUView::PerformanceGPUView(MainWindow *window, PerformanceButton *bu
                                                  UnitConverter::ConvertBytes(totalMem, memUnit).value,
                                                  UnitConverter::UnitTypeToString(memUnit),
                                                  memUsagePercent));
+
+            auto tempStr = fmt::format("{:.0f}°C", GPUApi::GetGPUTemperature(m_GpuId));
+            m_FlowGpuTemperature.set_text(tempStr);
+            m_Button->SetInfoText2(tempStr);
 
             m_UsageGraph->AddPoint(gpuUsagePercent);
             m_Button->AddGraphPoint(gpuUsagePercent);

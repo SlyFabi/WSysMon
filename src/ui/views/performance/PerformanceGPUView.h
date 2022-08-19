@@ -13,6 +13,7 @@ private:
     Gtk::Label m_FlowGpuUsage;
     Gtk::Label m_FlowGpuClock;
     Gtk::Label m_FlowGpuMemory;
+    Gtk::Label m_FlowGpuTemperature;
 
     Gtk::Label m_DetailDriver;
 };

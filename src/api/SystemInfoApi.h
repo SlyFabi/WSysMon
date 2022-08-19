@@ -32,6 +32,7 @@ public:
     static long GetCPUClock();
     static long GetCPUClock(int cpuId);
     static long GetMaxCPUClock();
+    static double GetCPUTemperature();
 
     static std::string GetCPUName();
     static int GetNumCPUs();
@@ -45,6 +46,7 @@ private:
     static std::string ReadCPUEntry(int cpuId, const std::string& name);
 
     static std::map<int, CPUTimes> m_CpuUsageDeltas;
+    static std::optional<std::string> m_CpuTempPath;
 
     SystemInfoApi() = default;
 };

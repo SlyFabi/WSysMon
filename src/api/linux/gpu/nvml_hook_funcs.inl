@@ -51,6 +51,7 @@ HOOK_FUNC( nvmlReturn_t, NVML_ERROR_NOT_FOUND, nvmlDeviceGetName, ( device, name
 
 HOOK_FUNC( nvmlReturn_t, NVML_ERROR_NOT_FOUND, nvmlDeviceGetClockInfo, ( device, type, clock ), nvmlDevice_t device, nvmlClockType_t type, unsigned int* clock )
 HOOK_FUNC( nvmlReturn_t, NVML_ERROR_NOT_FOUND, nvmlDeviceGetUtilizationRates, ( device, utilization ), nvmlDevice_t device, nvmlUtilization_t* utilization )
+HOOK_FUNC( nvmlReturn_t, NVML_ERROR_NOT_FOUND, nvmlDeviceGetTemperature, ( device, sensorType, temp ), nvmlDevice_t device, nvmlTemperatureSensors_t sensorType, unsigned int* temp )
 
 HOOK_FUNC( nvmlReturn_t, NVML_ERROR_NOT_FOUND, nvmlSystemGetDriverVersion, ( version, length ), char *version, unsigned int length )
 HOOK_FUNC( nvmlReturn_t, NVML_ERROR_NOT_FOUND, nvmlSystemGetNVMLVersion, ( version, length ), char *version, unsigned int length )

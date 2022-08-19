@@ -1,7 +1,6 @@
 #ifndef WSYSMON_DISKAPI_H
 #define WSYSMON_DISKAPI_H
 
-#include <string>
 #include "../utils/Utils.h"
 
 enum DiskType {
@@ -39,4 +38,4 @@ private:
 };
 
 
-#endif //WSYSMON_GPUAPI_H
+#endif //WSYSMON_DISKAPI_H
