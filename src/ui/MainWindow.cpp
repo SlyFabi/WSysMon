@@ -6,15 +6,19 @@
 MainWindow::MainWindow(const Glib::RefPtr<Gtk::Application>& application) {
     m_Application = application;
 
-    auto display = Gdk::Display::get_default();
-    auto monitor = display->get_primary_monitor();
-
-    Gdk::Rectangle screenSize;
-    monitor->get_workarea(screenSize);
-
     set_title("WSysMon");
-    set_default_size(0, (int)((double)screenSize.get_height() * 0.6));
+    set_default_size(0, 500);
     set_position(Gtk::WIN_POS_CENTER);
+
+    auto display = Gdk::Display::get_default();
+    if(display) {
+        auto monitor = display->get_primary_monitor();
+        if(monitor) {
+            Gdk::Rectangle screenSize;
+            monitor->get_workarea(screenSize);
+            set_default_size(0, (int)((double)screenSize.get_height() * 0.6));
+        }
+    }
 
     // Processes View
     m_ProcessView = new ProcessesView(this);

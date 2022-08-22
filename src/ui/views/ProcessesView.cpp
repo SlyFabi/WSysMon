@@ -118,20 +118,22 @@ ProcessesView::ProcessesView(MainWindow *window)
 
                 if(alpha > 0.6) {
                     auto rgba = Gdk::RGBA();
-                    rgba.set_rgba(0.0, 0.0, 0.0, 1.0);
+                    rgba.set_rgba(0., 0., 0., 1.);
                     textRenderer->property_foreground_rgba().set_value(rgba);
                 } else {
                     Gdk::RGBA textColor;
-                    m_ProcessTreeView.get_style_context()->lookup_color("theme_text_color", textColor);
+                    textColor.set_rgba(0., 0., 0., 1.);
+                    if(m_ProcessTreeView.get_style_context())
+                        m_ProcessTreeView.get_style_context()->lookup_color("theme_text_color", textColor);
                     textRenderer->property_foreground_rgba().set_value(textColor);
                 }
 
                 auto rgba = Gdk::RGBA();
-                rgba.set_rgba(1.0, 0.8203125, 0.390625, alpha);
+                rgba.set_rgba(1., 0.8203125, 0.390625, alpha);
                 renderer->property_cell_background_rgba().set_value(rgba);
             } else {
                 auto rgba = Gdk::RGBA();
-                rgba.set_rgba(0.0, 0.0, 0.0, 0.0);
+                rgba.set_rgba(0., 0., 0., 0.);
                 renderer->property_cell_background_rgba().set_value(rgba);
             }
         });

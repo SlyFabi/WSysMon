@@ -178,13 +178,10 @@ bool PerformanceButton::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
     graphRect.height = 80;
     m_Graph->Draw(cr, graphRect);
 
-    auto styleContext = Gtk::StyleContext::create();
-    auto widgetPath = Gtk::WidgetPath();
-    widgetPath.path_append_type(Gtk::Label::get_type());
-    styleContext->set_path(widgetPath);
-
     Gdk::RGBA textColor;
-    get_style_context()->lookup_color("theme_text_color", textColor);
+    textColor.set_rgba(0., 0., 0., 1.);
+    if(get_style_context())
+        get_style_context()->lookup_color("theme_text_color", textColor);
     Gdk::Cairo::set_source_rgba(cr, textColor);
 
     cr->move_to(140, 30);

@@ -182,7 +182,9 @@ void GraphWidget::Draw(const Cairo::RefPtr<Cairo::Context> &cr, GdkRectangle roo
     Gdk::Cairo::set_source_rgba(cr, background);
     cr->paint();
 
-    get_style_context()->lookup_color("theme_bg_color", background);
+    if(get_style_context())
+        get_style_context()->lookup_color("theme_bg_color", background);
+
     Gdk::Cairo::set_source_rgba(cr, background);
     cr->rectangle(plotArea.x, plotArea.y, plotArea.width, plotArea.height);
     cr->fill();
