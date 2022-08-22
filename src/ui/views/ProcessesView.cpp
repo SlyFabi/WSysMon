@@ -78,6 +78,16 @@ ProcessesView::ProcessesView(MainWindow *window)
 
     m_ProcessTreeModelColumns.CreateColumns(m_ProcessTreeView);
 
+    // Make resizable
+    for(int i = 0; i < m_ProcessTreeView.get_n_columns(); i++) {
+        auto col = m_ProcessTreeView.get_column(i);
+        col->set_resizable(true);
+        if(i == 0)
+            col->set_min_width(200);
+        else
+            col->set_min_width(50);
+    }
+
     // Render handler
     auto nameColumn = m_ProcessTreeView.get_column(0);
     auto nameRenderer = m_ProcessTreeView.get_column_cell_renderer(0);
