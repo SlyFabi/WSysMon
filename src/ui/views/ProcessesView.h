@@ -73,6 +73,8 @@ public:
 
     Gtk::Widget& GetRootWidget() override;
 
+    void Clear();
+    void MarkDirty();
     void UpdateCategory(int categoryId, ProcessNode *procRoot);
 
 private:
@@ -97,6 +99,7 @@ private:
     Gtk::TreeView m_ProcessTreeView;
     Glib::RefPtr<Gtk::TreeStore> m_ProcessTreeModel;
     ProcessesTreeModelColumns m_ProcessTreeModelColumns;
+    bool m_TreeDirty{};
 
     // Controls
     Gtk::VBox m_Root;

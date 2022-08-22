@@ -55,6 +55,7 @@ public:
 
     static ProcessNode *BuildTree(const std::vector<ProcessNode *>& procList);
     static ProcessNode *BuildFlatTree(const std::vector<ProcessNode *>& procList);
+    static ProcessNode *BuildPackedFlatTree(const std::vector<ProcessNode *>& procList);
 
 private:
     ProcessNode *m_Parent;

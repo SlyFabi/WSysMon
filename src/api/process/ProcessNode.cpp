@@ -218,3 +218,25 @@ ProcessNode *ProcessNode::BuildFlatTree(const std::vector<ProcessNode *> &procLi
     }
     return root;
 }
+
+ProcessNode *ProcessNode::BuildPackedFlatTree(const std::vector<ProcessNode *>& procList) {
+    std::map<int, ProcessNode *> pidMap;
+    for(auto proc : procList) {
+        pidMap.insert(std::make_pair(proc->GetPid(), proc));
+    }
+
+    auto root = new ProcessNode(0, -1, "ROOT", "", ProcessUserIds(), 0, 0, 0, 0, 0, 0, {});
+    for(auto proc : procList) {
+        ProcessNode *parent;
+        if(proc->GetParentPid() > 0) {
+            parent = pidMap[proc->GetParentPid()];
+            if(parent == nullptr || parent->GetName() != proc->GetName())
+                parent = root;
+        } else {
+            parent = root;
+        }
+
+        proc->SetParent(parent);
+    }
+    return root;
+}

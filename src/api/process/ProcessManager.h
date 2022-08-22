@@ -31,7 +31,7 @@ public:
     static void KillByPid(int pid, bool force = false);
 private:
     static std::vector<ProcessNode *> GetProcessesByCategory(int categoryId);
-    static std::vector<ProcessNode *> GetProcessesByFilter(const std::function<bool(ProcessNode *)>& filterFunc);
+    static std::vector<ProcessNode *> GetProcessesByFilter(const std::function<bool(ProcessNode *)>& filterFunc, bool withChildren = true);
     static std::vector<ProcessNode *> GetAllProcesses();
 
     static double GetCPUUsageForProc(const ProcessInfo& proc, CPUTimes cpuTimes);

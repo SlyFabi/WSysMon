@@ -1,5 +1,6 @@
 #include "ProcessManager.h"
 #include "../../utils/X11Utils.h"
+#include "../../storage/AppSettings.h"
 
 #include <unistd.h>
 #include <csignal>
@@ -36,19 +37,11 @@ ProcessNode *ProcessManager::GetProcessTreeByCategory(int categoryId) {
         return m_CategoryTreeCache[categoryId];
 
     ProcessNode *root;
-    switch(categoryId) {
-        case PROCESSES_VIEW_CATEGORY_BACKGROUND:
-            root = ProcessNode::BuildTree(GetProcessesByCategory(categoryId));
-            break;
-
-        case PROCESSES_VIEW_CATEGORY_APPS:
-        case PROCESSES_VIEW_CATEGORY_WINE:
-            root = ProcessNode::BuildTree(GetProcessesByCategory(categoryId));
-            break;
-        case PROCESSES_VIEW_CATEGORY_SYSTEM:
-        default:
-            root = ProcessNode::BuildTree(GetProcessesByCategory(categoryId));
-            break;
+    auto settings = AppSettings::Get();
+    if(settings.displayProcList) {
+        root = ProcessNode::BuildPackedFlatTree(GetProcessesByCategory(categoryId));
+    } else {
+        root = ProcessNode::BuildTree(GetProcessesByCategory(categoryId));
     }
 
     root->CalculateCPUUsageSums();
@@ -84,7 +77,7 @@ std::vector<ProcessNode *> ProcessManager::GetProcessesByCategory(int categoryId
         case PROCESSES_VIEW_CATEGORY_APPS: {
             auto windowPids = X11Utils::GetAllPidsWithWindows();
             filterFunc = [&](ProcessNode *proc) -> bool { return proc->GetUserIds().uid == getuid() && !is_in_app_blacklist(proc) && Utils::vectorContains(windowPids, proc->GetPid()); };
-            result = ProcessManager::GetProcessesByFilter(filterFunc);
+            result = ProcessManager::GetProcessesByFilter(filterFunc, !AppSettings::Get().displayProcList);
             break;
         }
         case PROCESSES_VIEW_CATEGORY_WINE: {
@@ -121,7 +114,7 @@ std::vector<ProcessNode *> ProcessManager::GetProcessesByCategory(int categoryId
     return result;
 }
 
-std::vector<ProcessNode *> ProcessManager::GetProcessesByFilter(const std::function<bool(ProcessNode *)>& filterFunc) {
+std::vector<ProcessNode *> ProcessManager::GetProcessesByFilter(const std::function<bool(ProcessNode *)>& filterFunc, bool withChildren) {
     std::vector<ProcessNode *> result;
     std::vector<int> pids;
 
@@ -130,6 +123,8 @@ std::vector<ProcessNode *> ProcessManager::GetProcessesByFilter(const std::funct
         if(filterFunc(proc)) {
             for(auto child : proc->FlatTree()) {
                 if(Utils::vectorContains(pids, child->GetPid()))
+                    continue;
+                if(!withChildren && proc->GetName() != child->GetName())
                     continue;
 
                 result.push_back(child->Copy());

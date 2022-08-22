@@ -176,6 +176,11 @@ ProcessesView::ProcessesView(MainWindow *window)
             m_UpdateThread->Dispatch();
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }, [this]() {
+            if(m_TreeDirty) {
+                Clear();
+                m_TreeDirty = false;
+            }
+
             m_CategoryCache.clear();
             UpdateCategory(PROCESSES_VIEW_CATEGORY_APPS, m_AppProcesses);
             UpdateCategory(PROCESSES_VIEW_CATEGORY_WINE, m_WineProcesses);
@@ -271,6 +276,21 @@ std::optional<Gtk::TreeIter> ProcessesView::GetSelectedIter() {
     }
 
     return std::nullopt;
+}
+
+void ProcessesView::Clear() {
+    std::vector<Gtk::TreeRow> toRemove{};
+    for(const auto& row : m_ProcessTreeModel->children())
+        if(!IsCategory(row))
+            toRemove.push_back(row);
+
+    for(const auto& row : toRemove)
+        if(m_ProcessTreeModel->iter_is_valid(row))
+            m_ProcessTreeModel->erase(row);
+}
+
+void ProcessesView::MarkDirty() {
+    m_TreeDirty = true;
 }
 
 void ProcessesView::UpdateCategory(int categoryId, ProcessNode *procRoot) {
