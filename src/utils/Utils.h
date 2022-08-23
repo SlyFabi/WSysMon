@@ -95,6 +95,10 @@ public:
         return str;
     }
 
+    static inline int stringToInt(const std::string& str) {
+        return (int)stringToLong(str);
+    }
+
     static long stringToLong(const std::string& str) {
         errno = 0;
         char *end;
