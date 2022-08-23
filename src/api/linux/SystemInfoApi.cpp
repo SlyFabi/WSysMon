@@ -42,16 +42,16 @@ CPUTimes SystemInfoApi::GetCPUTimes(int cpuId) {
             auto entryCpuIdStr = matches[1].str();
             int entryCpuId = -1;
             if(!entryCpuIdStr.empty())
-                entryCpuId = std::stoi(entryCpuIdStr);
+                entryCpuId = Utils::stringToInt(entryCpuIdStr);
 
-            auto user = std::stol(matches[2].str());
-            auto nice = std::stol(matches[3].str());
-            auto system = std::stol(matches[4].str());
-            auto idle = std::stol(matches[5].str());
-            auto iowait = std::stol(matches[6].str());
-            auto irq = std::stol(matches[7].str());
-            auto softirq = std::stol(matches[8].str());
-            auto steal = std::stol(matches[9].str());
+            auto user = Utils::stringToInt(matches[2].str());
+            auto nice = Utils::stringToInt(matches[3].str());
+            auto system = Utils::stringToInt(matches[4].str());
+            auto idle = Utils::stringToInt(matches[5].str());
+            auto iowait = Utils::stringToInt(matches[6].str());
+            auto irq = Utils::stringToInt(matches[7].str());
+            auto softirq = Utils::stringToInt(matches[8].str());
+            auto steal = Utils::stringToInt(matches[9].str());
 
             if(entryCpuId == cpuId) {
                 times.user = user;
@@ -110,7 +110,7 @@ long SystemInfoApi::GetCPUClock() {
 
 long SystemInfoApi::GetCPUClock(int cpuId) {
     auto mHzStr = ReadCPUEntry(cpuId, "cpu MHz");
-    auto mHz = std::stod(mHzStr);
+    auto mHz = Utils::stringToDouble(mHzStr);
     return (long)mHz * 1000000;
 }
 
@@ -149,7 +149,7 @@ std::string SystemInfoApi::GetCPUName() {
 }
 
 int SystemInfoApi::GetNumCPUs() {
-    return std::stoi(ReadCPUEntry(0, "cpu cores"));
+    return Utils::stringToInt(ReadCPUEntry(0, "cpu cores"));
 }
 
 int SystemInfoApi::GetNumCPUsLogical() {
@@ -160,7 +160,7 @@ int SystemInfoApi::GetSocketCount() {
     int maxSocketId = 0;
     for(int i = 0; i < GetNumCPUs(); i++) {
         auto socketStr = ReadCPUEntry(i, "physical id");
-        auto socketId = std::stoi(socketStr);
+        auto socketId = Utils::stringToInt(socketStr);
         if(socketId > maxSocketId)
             maxSocketId = socketId;
     }
@@ -172,7 +172,7 @@ long SystemInfoApi::GetUptimeMS() {
     auto data = IOUtils::ReadAllText("/proc/uptime");
     auto split = Utils::stringSplit(data, " ");
 
-    auto uptimeSeconds = std::stod(split[0]);
+    auto uptimeSeconds = Utils::stringToDouble(split[0]);
     return (long)(uptimeSeconds * 1000.);
 }
 
@@ -188,7 +188,7 @@ long SystemInfoApi::ReadNamedEntry(const std::string& path, const std::string& n
             auto entryVal = matches[2].str();
 
             if(name == entryName) {
-                return std::stol(entryVal);
+                return Utils::stringToLong(entryVal);
             }
         }
     }
@@ -212,7 +212,7 @@ std::string SystemInfoApi::ReadCPUEntry(int cpuId, const std::string& name) {
                 auto entryVal = matches[2].str();
 
                 if(entryName == "processor") {
-                    entryCpuId = std::stoi(entryVal);
+                    entryCpuId = Utils::stringToInt(entryVal);
                 }
 
                 if(entryCpuId == cpuId && name == entryName) {
