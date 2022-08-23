@@ -5,8 +5,6 @@
 #include <map>
 #include <vector>
 
-#include <proc/readproc.h>
-
 #include "ProcessNode.h"
 #include "../ProcessesApi.h"
 

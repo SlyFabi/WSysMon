@@ -7,7 +7,6 @@ A windows task manager clone for Linux.
 # Building
 The following dependencies are required:
 * `libgtkmm-3.0`
-* `libprocps`
 
 ```
 mkdir build
