@@ -1,15 +1,9 @@
-#ifndef WSYSMON_GPUAPI_H
-#define WSYSMON_GPUAPI_H
+#ifndef WSYSMON_DRMGPUAPI_H
+#define WSYSMON_DRMGPUAPI_H
 
-#include "../utils/Utils.h"
-#include "linux/gpu/NvGpuApi.h"
-#include "linux/gpu/DrmGpuApi.h"
+#include "../../../utils/Utils.h"
 
-struct GPUProcessInfo {
-    long memoryUsage;
-};
-
-class GPUApi {
+class DrmGpuApi {
 public:
     static int GetNumGPUs();
 
@@ -23,12 +17,7 @@ public:
     static long GetGPUClock(int gpuId);
     static double GetGPUUsagePercent(int gpuId);
     static double GetGPUTemperature(int gpuId);
-
-    static GPUProcessInfo GetGPUProcessInfo(nvgpu_info_t nvidiaInfo, int gpuId, int pid);
-
-private:
-    GPUApi() = default;
 };
 
 
-#endif //WSYSMON_GPUAPI_H
+#endif //WSYSMON_DRMGPUAPI_H
