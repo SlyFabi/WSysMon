@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
-project(WSysMon)
+project(WSysMon VERSION 0.1.2 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_FLAGS_RELEASE "-O3 -g0 -msse4 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -g0 -msse4 -DNDEBUG")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-Wl,-O3 -msse4")
 find_package(PkgConfig)
 include(FetchContent)
 
