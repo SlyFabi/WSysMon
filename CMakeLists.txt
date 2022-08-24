@@ -5,12 +5,15 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(PkgConfig)
 include(FetchContent)
 
-FetchContent_Declare(
-        spdlog
-        GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.10.0
-)
-FetchContent_MakeAvailable(spdlog)
+find_package(spdlog)
+if(NOT spdlog_FOUND)
+        FetchContent_Declare(
+                spdlog
+                GIT_REPOSITORY https://github.com/gabime/spdlog.git
+                GIT_TAG v1.10.0
+        )
+        FetchContent_MakeAvailable(spdlog)
+endif()
 
 if(${CMAKE_VERSION} VERSION_LESS "3.24.0")
     FetchContent_Declare(
