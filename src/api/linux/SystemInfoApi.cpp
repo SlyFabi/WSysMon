@@ -44,14 +44,14 @@ CPUTimes SystemInfoApi::GetCPUTimes(int cpuId) {
             if(!entryCpuIdStr.empty())
                 entryCpuId = Utils::stringToInt(entryCpuIdStr);
 
-            auto user = Utils::stringToInt(matches[2].str());
-            auto nice = Utils::stringToInt(matches[3].str());
-            auto system = Utils::stringToInt(matches[4].str());
-            auto idle = Utils::stringToInt(matches[5].str());
-            auto iowait = Utils::stringToInt(matches[6].str());
-            auto irq = Utils::stringToInt(matches[7].str());
-            auto softirq = Utils::stringToInt(matches[8].str());
-            auto steal = Utils::stringToInt(matches[9].str());
+            auto user = Utils::stringToLong(matches[2].str());
+            auto nice = Utils::stringToLong(matches[3].str());
+            auto system = Utils::stringToLong(matches[4].str());
+            auto idle = Utils::stringToLong(matches[5].str());
+            auto iowait = Utils::stringToLong(matches[6].str());
+            auto irq = Utils::stringToLong(matches[7].str());
+            auto softirq = Utils::stringToLong(matches[8].str());
+            auto steal = Utils::stringToLong(matches[9].str());
 
             if(entryCpuId == cpuId) {
                 times.user = user;
