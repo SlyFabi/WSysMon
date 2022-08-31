@@ -22,8 +22,8 @@ PerformanceDiskView::PerformanceDiskView(MainWindow *window, PerformanceButton *
     m_Button->SetInfoText(std::filesystem::path(DiskApi::GetDiskPath(m_InterfaceId)).stem().string());
     m_Button->SetInfoText2("0%");
 
-    AddFlowDetail("Read", m_FlowRead);
-    AddFlowDetail("Written", m_FlowWritten);
+    AddFlowDetail("Read Speed", m_FlowRead);
+    AddFlowDetail("Write Speed", m_FlowWritten);
     AddFlowDetail("Total read", m_FlowTotalRead);
     AddFlowDetail("Total written", m_FlowTotalWritten);
 
