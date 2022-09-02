@@ -1,6 +1,7 @@
 #include "ProcessesView.h"
 #include "../../api/process/ProcessManager.h"
 #include "../../utils/UnitConverter.h"
+#include "../../storage/AppSettings.h"
 #include "../MainWindow.h"
 
 #include <chrono>
@@ -335,15 +336,18 @@ void ProcessesView::UpdateCategoryProcess(int categoryId, ProcessNode *procNode)
     treeRow[m_ProcessTreeModelColumns.m_Category] = categoryId;
 
     // Info
+    auto unit = UnitType::AUTO;
+    if(AppSettings::Get().useIECUnits)
+        unit = UnitType::AUTO_I;
     treeRow[m_ProcessTreeModelColumns.m_Name] = procNode->GetName();
     treeRow[m_ProcessTreeModelColumns.m_Status] = procNode->GetStatus();
     treeRow[m_ProcessTreeModelColumns.m_CPUUsage] = fmt::format("{:.2f}%", procNode->GetCPUUsage());
-    treeRow[m_ProcessTreeModelColumns.m_RAMUsage] = UnitConverter::ConvertBytesString(procNode->GetRAMUsage(), UnitType::AUTO);
-    treeRow[m_ProcessTreeModelColumns.m_DiskUsage] = UnitConverter::ConvertBytesString(procNode->GetDiskUsage(), UnitType::AUTO);
-    //treeRow[m_ProcessTreeModelColumns.m_NetworkUsage] = UnitConverter::ConvertBytesString(procNode->GetNetworkUsage(), UnitType::AUTO);
+    treeRow[m_ProcessTreeModelColumns.m_RAMUsage] = UnitConverter::ConvertBytesString(procNode->GetRAMUsage(), unit);
+    treeRow[m_ProcessTreeModelColumns.m_DiskUsage] = UnitConverter::ConvertBytesString(procNode->GetDiskUsage(), unit);
+    //treeRow[m_ProcessTreeModelColumns.m_NetworkUsage] = UnitConverter::ConvertBytesString(procNode->GetNetworkUsage(), unit);
 
     if(procNode->GetGPUInfo().memoryUsage > 0)
-        treeRow[m_ProcessTreeModelColumns.m_GPUMemoryUsage] = UnitConverter::ConvertBytesString(procNode->GetGPUInfo().memoryUsage, UnitType::AUTO);
+        treeRow[m_ProcessTreeModelColumns.m_GPUMemoryUsage] = UnitConverter::ConvertBytesString(procNode->GetGPUInfo().memoryUsage, unit);
 
     // Colors
     auto diskGB = (double)procNode->GetDiskUsage() / 1000. / 1000. / 1000.;

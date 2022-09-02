@@ -2,6 +2,7 @@
 #include "PerformanceRAMView.h"
 #include "../../../api/SystemInfoApi.h"
 #include "../../../utils/UnitConverter.h"
+#include "../../../storage/AppSettings.h"
 
 PerformanceRAMView::PerformanceRAMView(MainWindow *window, PerformanceButton *button)
     : PerformanceSubView(window, button, new GraphWidget(0, 100, 60)) {
@@ -28,17 +29,21 @@ PerformanceRAMView::PerformanceRAMView(MainWindow *window, PerformanceButton *bu
             auto availableRam = SystemInfoApi::GetFreeRam();
             auto ramUsagePercent = SystemInfoApi::GetRamUsagePercent() * 100.;
 
-            auto ramUnit = UnitConverter::GetBestUnitForBytes(totalRam);
+            auto useIec = AppSettings::Get().useIECUnits;
+            auto ramUnit = UnitConverter::GetBestUnitForBytes(totalRam, useIec);
             m_Button->SetInfoText(fmt::format("{:.1f}/{:.0f} {} ({:.0f} %)",
                                               UnitConverter::ConvertBytes(usedRam, ramUnit).value,
                                               UnitConverter::ConvertBytes(totalRam, ramUnit).value,
                                               UnitConverter::UnitTypeToString(ramUnit),
                                               ramUsagePercent));
 
+            auto unit = UnitType::AUTO;
+            if(useIec)
+                unit = UnitType::AUTO_I;
             m_FlowMemoryUsage.set_text(fmt::format("{:.0f}%", ramUsagePercent));
-            m_FlowUsedMemory.set_text(UnitConverter::ConvertBytesString(usedRam));
-            m_FlowAvailableMemory.set_text(UnitConverter::ConvertBytesString(availableRam));
-            m_FlowTotalMemory.set_text(UnitConverter::ConvertBytesString(totalRam));
+            m_FlowUsedMemory.set_text(UnitConverter::ConvertBytesString(usedRam, unit));
+            m_FlowAvailableMemory.set_text(UnitConverter::ConvertBytesString(availableRam, unit));
+            m_FlowTotalMemory.set_text(UnitConverter::ConvertBytesString(totalRam, unit));
 
             m_UsageGraph->AddPoint(ramUsagePercent);
             m_Button->AddGraphPoint(ramUsagePercent);

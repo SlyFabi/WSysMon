@@ -46,16 +46,27 @@ MainWindow::MainWindow(const Glib::RefPtr<Gtk::Application>& application) {
         spdlog::debug("About");
     });
 
-    auto action = Gio::SimpleAction::create_bool("mainView.displayProcList",
+    auto procListAction = Gio::SimpleAction::create_bool("mainView.displayProcList",
                                                  AppSettings::Get().displayProcList);
-    action->signal_activate().connect([this, action](const Glib::VariantBase& variant) {
+    procListAction->signal_activate().connect([this, procListAction](const Glib::VariantBase& variant) {
         auto settings = AppSettings::Get();
         settings.displayProcList = !settings.displayProcList;
-        action->set_state(Glib::Variant<bool>::create(settings.displayProcList));
+        procListAction->set_state(Glib::Variant<bool>::create(settings.displayProcList));
         AppSettings::Save(settings);
         m_ProcessView->MarkDirty();
     });
-    m_Application->add_action(action);
+    m_Application->add_action(procListAction);
+
+    auto iecAction = Gio::SimpleAction::create_bool("mainView.useIECUnits",
+                                                 AppSettings::Get().useIECUnits);
+    iecAction->signal_activate().connect([this, iecAction](const Glib::VariantBase& variant) {
+        auto settings = AppSettings::Get();
+        settings.useIECUnits = !settings.useIECUnits;
+        iecAction->set_state(Glib::Variant<bool>::create(settings.useIECUnits));
+        AppSettings::Save(settings);
+        m_ProcessView->MarkDirty();
+    });
+    m_Application->add_action(iecAction);
 
     // Menu
     Glib::ustring ui_info = R""""(
@@ -71,6 +82,10 @@ MainWindow::MainWindow(const Glib::RefPtr<Gtk::Application>& application) {
       <item>
         <attribute name="label">Display as list</attribute>
         <attribute name="action">app.mainView.displayProcList</attribute>
+      </item>
+      <item>
+        <attribute name="label">Use IEC units</attribute>
+        <attribute name="action">app.mainView.useIECUnits</attribute>
       </item>
     </section>
   </menu>

@@ -2,6 +2,7 @@
 #include "PerformanceGPUView.h"
 #include "../../../api/GPUApi.h"
 #include "../../../utils/UnitConverter.h"
+#include "../../../storage/AppSettings.h"
 
 PerformanceGPUView::PerformanceGPUView(MainWindow *window, PerformanceButton *button, int gpuId)
     : PerformanceSubView(window, button, new GraphWidget(0, 100, 60)) {
@@ -37,7 +38,7 @@ PerformanceGPUView::PerformanceGPUView(MainWindow *window, PerformanceButton *bu
             auto totalMem = GPUApi::GetGPUTotalMemory(m_GpuId);
             auto usedMem = GPUApi::GetGPUUsedMemory(m_GpuId);
             auto memUsagePercent = 100. * (double)usedMem / (double)totalMem;
-            auto memUnit = UnitConverter::GetBestUnitForBytes(totalMem);
+            auto memUnit = UnitConverter::GetBestUnitForBytes(totalMem, AppSettings::Get().useIECUnits);
 
             auto gpuUsageStr = fmt::format("{:.0f}%", gpuUsagePercent);
             m_Button->SetInfoText(gpuUsageStr);

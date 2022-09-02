@@ -6,10 +6,14 @@
 
 bool AppSettings::m_Initialized = false;
 std::string AppSettings::m_ConfigPath = {};
+std::optional<Settings> AppSettings::m_SettingsCache = {};
 
 Settings AppSettings::Get() {
     if(!m_Initialized)
         Init();
+    if(m_SettingsCache.has_value())
+        return m_SettingsCache.value();
+
     try {
         std::ifstream inFile(m_ConfigPath);
         nlohmann::json json;
@@ -17,6 +21,7 @@ Settings AppSettings::Get() {
 
         auto settings = Settings();
         settings.displayProcList = json["displayProcList"];
+        settings.useIECUnits = json["useIECUnits"];
         return settings;
     }
     catch (...) {
@@ -25,6 +30,7 @@ Settings AppSettings::Get() {
 
     auto def = Settings();
     def.displayProcList = false;
+    def.useIECUnits = false;
     Save(def);
     return def;
 }
@@ -36,8 +42,10 @@ void AppSettings::Save(Settings settings) {
         std::ofstream outFile(m_ConfigPath);
         nlohmann::json json = {
                 {"displayProcList", settings.displayProcList},
+                {"useIECUnits", settings.useIECUnits},
         };
         outFile << std::setw(4) << json << std::endl;
+        m_SettingsCache = settings;
     }
     catch (...) {
         spdlog::error("Could not write app storage!");

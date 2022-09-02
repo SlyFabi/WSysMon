@@ -2,6 +2,7 @@
 #include "PerformanceNetworkView.h"
 #include "../../../api/NetworkApi.h"
 #include "../../../utils/UnitConverter.h"
+#include "../../../storage/AppSettings.h"
 
 PerformanceNetworkView::PerformanceNetworkView(MainWindow *window, PerformanceButton *button, int id)
     : PerformanceSubView(window, button, new GraphWidget(0, 100, 60)) {
@@ -51,10 +52,14 @@ PerformanceNetworkView::PerformanceNetworkView(MainWindow *window, PerformanceBu
             auto totalReceived = NetworkApi::GetInterfaceTotalReceived(m_InterfaceId);
             auto totalSent = NetworkApi::GetInterfaceTotalSent(m_InterfaceId);
 
-            m_FlowReceive.set_text(fmt::format("{}/s", UnitConverter::ConvertBytesString(receive)));
-            m_FlowSend.set_text(fmt::format("{}/s", UnitConverter::ConvertBytesString(send)));
-            m_FlowTotalReceived.set_text(UnitConverter::ConvertBytesString(totalReceived));
-            m_FlowTotalSent.set_text(UnitConverter::ConvertBytesString(totalSent));
+            auto unit = UnitType::AUTO;
+            if(AppSettings::Get().useIECUnits)
+                unit = UnitType::AUTO_I;
+
+            m_FlowReceive.set_text(fmt::format("{}/s", UnitConverter::ConvertBytesString(receive, unit)));
+            m_FlowSend.set_text(fmt::format("{}/s", UnitConverter::ConvertBytesString(send, unit)));
+            m_FlowTotalReceived.set_text(UnitConverter::ConvertBytesString(totalReceived, unit));
+            m_FlowTotalSent.set_text(UnitConverter::ConvertBytesString(totalSent, unit));
 
             auto recvConv = UnitConverter::ConvertBytesToBits(receive);
             auto sentConv = UnitConverter::ConvertBytesToBits(send);

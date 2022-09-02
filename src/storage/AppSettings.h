@@ -5,6 +5,7 @@
 
 struct Settings {
     bool displayProcList;
+    bool useIECUnits;
 };
 
 class AppSettings {
@@ -18,6 +19,7 @@ private:
 
     static bool m_Initialized;
     static std::string m_ConfigPath;
+    static std::optional<Settings> m_SettingsCache;
 };
 
 

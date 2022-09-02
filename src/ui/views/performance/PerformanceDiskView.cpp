@@ -4,6 +4,7 @@
 #include "PerformanceDiskView.h"
 #include "../../../api/DiskApi.h"
 #include "../../../utils/UnitConverter.h"
+#include "../../../storage/AppSettings.h"
 
 PerformanceDiskView::PerformanceDiskView(MainWindow *window, PerformanceButton *button, int id)
         : PerformanceSubView(window, button, new GraphWidget(0, 100, 60)) {
@@ -60,10 +61,13 @@ PerformanceDiskView::PerformanceDiskView(MainWindow *window, PerformanceButton *
         auto totalRead = DiskApi::GetDiskTotalRead(m_InterfaceId);
         auto totalWritten = DiskApi::GetDiskTotalWritten(m_InterfaceId);
 
-        m_FlowRead.set_text(UnitConverter::ConvertBytesString(read));
-        m_FlowWritten.set_text(UnitConverter::ConvertBytesString(written));
-        m_FlowTotalRead.set_text(UnitConverter::ConvertBytesString(totalRead));
-        m_FlowTotalWritten.set_text(UnitConverter::ConvertBytesString(totalWritten));
+        auto unit = UnitType::AUTO;
+        if(AppSettings::Get().useIECUnits)
+            unit = UnitType::AUTO_I;
+        m_FlowRead.set_text(UnitConverter::ConvertBytesString(read, unit));
+        m_FlowWritten.set_text(UnitConverter::ConvertBytesString(written, unit));
+        m_FlowTotalRead.set_text(UnitConverter::ConvertBytesString(totalRead, unit));
+        m_FlowTotalWritten.set_text(UnitConverter::ConvertBytesString(totalWritten, unit));
 
         auto diskUsage = DiskApi::GetDiskUsage(m_InterfaceId);
         m_UsageGraph->AddPoint(diskUsage);
