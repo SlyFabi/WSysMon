@@ -6,6 +6,7 @@
 
 #include "views/ProcessesView.h"
 #include "views/PerformanceView.h"
+#include "views/AutostartView.h"
 
 class MainWindow : public Gtk::Window {
 public:
@@ -29,6 +30,7 @@ private:
 
     ProcessesView *m_ProcessView;
     PerformanceView *m_PerformanceView;
+    AutostartView *m_AutostartView;
 };
 
 
