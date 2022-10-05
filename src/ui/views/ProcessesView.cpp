@@ -25,6 +25,8 @@ ProcessesView::ProcessesView(MainWindow *window)
     m_Window->GetApp()->add_action("processesView.killTask", sigc::mem_fun(*this, &ProcessesView::OnActionKillTask));
     m_Window->GetApp()->set_accel_for_action("processesView.killTask", "<Primary>k");
 
+    m_Window->GetApp()->add_action("processesView.properties", sigc::mem_fun(*this, &ProcessesView::OnActionProcessProperties));
+
     Glib::ustring ui_info =
             "<interface>"
             "  <menu id='menu-processesViewRightClick'>"
@@ -39,7 +41,7 @@ ProcessesView::ProcessesView(MainWindow *window)
             "      </item>"
             "      <item>"
             "        <attribute name='label' translatable='yes'>Properties</attribute>"
-            "        <attribute name='action'>app.processesView.Properties</attribute>"
+            "        <attribute name='action'>app.processesView.properties</attribute>"
             "      </item>"
             "    </section>"
             "  </menu>"
@@ -181,6 +183,9 @@ ProcessesView::ProcessesView(MainWindow *window)
     m_Root.pack_start(m_ScrolledWindow, true, true);
     m_Root.pack_end(m_ButtonBox, false, false);
 
+    // Details window
+    m_DetailsWindow.set_title("Process Properties");
+
     // Update thread
     m_UpdateThread = new DispatcherThread([this]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(250));
@@ -247,7 +252,29 @@ void ProcessesView::OnActionKillTask() {
 }
 
 void ProcessesView::OnActionProcessProperties() {
+    auto iter = GetSelectedIter();
+    if(iter != std::nullopt) {
+        auto row = *iter.value();
+        auto pid = (int)row.get_value(m_ProcessTreeModelColumns.m_Pid);
+        auto proc = ProcessManager::GetProcessByPid(pid);
 
+        if(proc != nullptr) {
+            auto unit = UnitType::AUTO;
+            if(AppSettings::Get().useIECUnits)
+                unit = UnitType::AUTO_I;
+
+            m_DetailsWindow.hide();
+            m_DetailsWindow.Clear();
+
+            m_DetailsWindow.AddDetail("PID", std::to_string(proc->GetPid()));
+            m_DetailsWindow.AddDetail("Name", proc->GetName());
+            m_DetailsWindow.AddDetail("User", std::to_string(proc->GetUserIds().uid));
+            m_DetailsWindow.AddDetail("RAM Usage", UnitConverter::ConvertBytesString(proc->GetRAMUsage(), unit));
+            m_DetailsWindow.AddDetail("Path", proc->GetDetails().path);
+
+            m_DetailsWindow.show_all();
+        }
+    }
 }
 
 void ProcessesView::OnRowActivated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn *column) {

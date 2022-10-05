@@ -7,9 +7,13 @@
 #include "../ProcessesApi.h"
 #include "../GPUApi.h"
 
+struct ProcessDetails {
+    std::string path;
+};
+
 class ProcessNode {
 public:
-    ProcessNode(int pid, int parentPid, const std::string& name, const std::string& status, ProcessUserIds userIds,
+    ProcessNode(int pid, int parentPid, const std::string& name, const std::string& status, ProcessUserIds userIds, ProcessDetails details,
                 double cpuUsage, long ramUsage, long diskUsage, long networkUsage,
                 long ioBytesRead, long ioBytesWritten,
                 GPUProcessInfo gpuInfo);
@@ -30,6 +34,7 @@ public:
     std::string GetName();
     std::string GetStatus();
     ProcessUserIds GetUserIds();
+    ProcessDetails GetDetails();
     GPUProcessInfo GetGPUInfo();
 
     [[nodiscard]] double GetCPUUsage() const;
@@ -67,6 +72,7 @@ private:
     std::string m_Name;
     std::string m_Status;
     ProcessUserIds m_Uids{};
+    ProcessDetails m_Details{};
     GPUProcessInfo m_GPUInfo{};
 
     double m_CPUUsage;

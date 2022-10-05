@@ -2,7 +2,7 @@
 #include <map>
 #include "ProcessNode.h"
 
-ProcessNode::ProcessNode(int pid, int parentPid, const std::string& name, const std::string& status, ProcessUserIds userIds,
+ProcessNode::ProcessNode(int pid, int parentPid, const std::string& name, const std::string& status, ProcessUserIds userIds, ProcessDetails details,
                          double cpuUsage, long ramUsage, long diskUsage, long networkUsage,
                          long ioBytesRead, long ioBytesWritten,
                          GPUProcessInfo gpuInfo) {
@@ -10,6 +10,7 @@ ProcessNode::ProcessNode(int pid, int parentPid, const std::string& name, const 
     m_ParentPid = parentPid;
     m_Name = name;
     m_Status = status;
+    m_Details = details;
     m_Uids = userIds;
     m_GPUInfo = gpuInfo;
     m_CPUUsage = cpuUsage;
@@ -22,7 +23,7 @@ ProcessNode::ProcessNode(int pid, int parentPid, const std::string& name, const 
 }
 
 ProcessNode *ProcessNode::Copy() {
-    return new ProcessNode(m_Pid, m_ParentPid, m_Name, m_Status, m_Uids, m_CPUUsage, m_RAMUsage, m_DiskUsage, m_NetworkUsage, m_IOBytesRead, m_IOBytesWritten, m_GPUInfo);
+    return new ProcessNode(m_Pid, m_ParentPid, m_Name, m_Status, m_Uids, m_Details, m_CPUUsage, m_RAMUsage, m_DiskUsage, m_NetworkUsage, m_IOBytesRead, m_IOBytesWritten, m_GPUInfo);
 }
 
 ProcessNode *ProcessNode::CopyTree() {
@@ -79,6 +80,10 @@ std::string ProcessNode::GetStatus() {
 
 ProcessUserIds ProcessNode::GetUserIds() {
     return m_Uids;
+}
+
+ProcessDetails ProcessNode::GetDetails() {
+    return m_Details;
 }
 
 GPUProcessInfo ProcessNode::GetGPUInfo() {
@@ -190,7 +195,7 @@ ProcessNode *ProcessNode::BuildTree(const std::vector<ProcessNode *>& procList) 
         pidMap.insert(std::make_pair(proc->GetPid(), proc));
     }
 
-    auto root = new ProcessNode(0, -1, "ROOT", "", ProcessUserIds(), 0, 0, 0, 0, 0, 0, {});
+    auto root = new ProcessNode(0, -1, "ROOT", "", ProcessUserIds(), ProcessDetails(), 0, 0, 0, 0, 0, 0, {});
     for(auto proc : procList) {
         ProcessNode *parent;
         if(proc->GetParentPid() > 0) {
@@ -208,7 +213,7 @@ ProcessNode *ProcessNode::BuildTree(const std::vector<ProcessNode *>& procList) 
 }
 
 ProcessNode *ProcessNode::BuildFlatTree(const std::vector<ProcessNode *> &procList) {
-    auto root = new ProcessNode(0, -1, "ROOT", "", ProcessUserIds(), 0, 0, 0, 0, 0, 0, {});
+    auto root = new ProcessNode(0, -1, "ROOT", "", ProcessUserIds(), ProcessDetails(), 0, 0, 0, 0, 0, 0, {});
     for(auto proc : procList) {
         proc->SetParent(root);
     }
@@ -221,7 +226,7 @@ ProcessNode *ProcessNode::BuildPackedFlatTree(const std::vector<ProcessNode *>& 
         pidMap.insert(std::make_pair(proc->GetPid(), proc));
     }
 
-    auto root = new ProcessNode(0, -1, "ROOT", "", ProcessUserIds(), 0, 0, 0, 0, 0, 0, {});
+    auto root = new ProcessNode(0, -1, "ROOT", "", ProcessUserIds(), ProcessDetails(), 0, 0, 0, 0, 0, 0, {});
     for(auto proc : procList) {
         ProcessNode *parent;
         if(proc->GetParentPid() > 0) {

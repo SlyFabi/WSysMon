@@ -8,6 +8,7 @@
 
 #include "../../api/process/ProcessNode.h"
 #include "../../utils/DispatcherThread.h"
+#include "../DetailsWindow.h"
 #include "View.h"
 
 
@@ -135,6 +136,8 @@ private:
 
     ProcessViewColumn m_SortColumn = ProcessViewColumn::NAME;
     bool m_SortOrder = false;
+
+    DetailsWindow m_DetailsWindow{};
 
     ProcessNode *m_AppProcesses{};
     ProcessNode *m_WineProcesses{};

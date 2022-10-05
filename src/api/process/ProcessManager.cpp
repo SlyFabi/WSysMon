@@ -150,11 +150,14 @@ std::vector<ProcessNode *> ProcessManager::GetAllProcesses() {
         auto cpuUsage = GetCPUUsageForProc(proc, cpuTimes);
         auto ioUsage = GetIOUsageForProc(proc);
 
+        ProcessDetails details{};
+        details.path = proc.path;
+
         GPUProcessInfo gpuInfo{};
         if(nvidiaInfo.has_value())
             gpuInfo = GPUApi::GetGPUProcessInfo(nvidiaInfo.value(), 0, proc.pid);
 
-        auto node = new ProcessNode(proc.pid, proc.parentPid, proc.name, "", proc.uids,
+        auto node = new ProcessNode(proc.pid, proc.parentPid, proc.name, "", proc.uids, details,
                                     cpuUsage, proc.memoryUsageBytes, ioUsage.diskUsageBytes, 0,
                                     proc.ioBytesRead, proc.ioBytesWritten, gpuInfo);
         result.push_back(node);
