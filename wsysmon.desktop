@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Name=WSysMon
+GenericName=Task Manager
+Comment=A Windows task manager clone for Linux.
+TryExec=WSysMon
+Exec=WSysMon %U
+StartupWMClass=WSysMon
+Keywords=Monitor;System;Process;CPU;GPU;Memory;Network;Usage;Performance;Task;Manager;Activity;
+StartupNotify=true
+Terminal=false
+X-MultipleArgs=True
+Icon=wsysmon
+Type=Application
+Categories=GTK;System;Monitor;
