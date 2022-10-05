@@ -153,22 +153,18 @@ long ProcessNode::CalculateRAMUsageSums() {
     return m_RAMUsage;
 }
 
+long ProcessNode::CalculateDiskUsageSums() {
+    for(auto child : m_Children) {
+        m_DiskUsage += child->CalculateDiskUsageSums();
+    }
+    return m_DiskUsage;
+}
+
 long ProcessNode::CalculateGPUUsageSums() {
     for(auto child : m_Children) {
         m_GPUInfo.memoryUsage += child->CalculateGPUUsageSums();
     }
     return m_GPUInfo.memoryUsage;
-}
-
-void ProcessNode::SortTree() {
-    std::sort(m_Children.begin(), m_Children.end(), [](const ProcessNode *a, const ProcessNode *b) -> bool {
-        auto aName = Utils::stringToLower(a->m_Name);
-        auto bName = Utils::stringToLower(b->m_Name);
-        return bName.compare(aName) > 0;
-    });
-
-    for(auto child : m_Children)
-        child->SortTree();
 }
 
 void ProcessNode::Reduce(std::vector<ProcessNode *>& procList, const std::vector<ProcessNode *>& toRemove) {

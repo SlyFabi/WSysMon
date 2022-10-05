@@ -10,6 +10,17 @@
 #include "../../utils/DispatcherThread.h"
 #include "View.h"
 
+
+enum ProcessViewColumn {
+    NAME = 0,
+    STATUS = 1,
+    CPU_USAGE = 2,
+    RAM_USAGE = 3,
+    DISK_USAGE = 4,
+    GPU_MEM_USAGE = 5,
+    PID = 6
+};
+
 class ProcessesTreeModelColumns : public Gtk::TreeModel::ColumnRecord {
 public:
     ProcessesTreeModelColumns() {
@@ -86,7 +97,10 @@ private:
 
     void UpdateCategoryProcess(int categoryId, ProcessNode *procNode);
     Gtk::TreeIter AddProcess(int categoryId, ProcessNode *procNode, std::optional<Gtk::TreeIter> parent);
+
     Gtk::TreeIter GetSortedInsertionRow(int categoryId, ProcessNode *procNode);
+    std::optional<Gtk::TreeIter> GetSortedInsertionRow(ProcessNode *procNode, const Gtk::TreeIter& parent);
+    bool SortCompare(ProcessNode *procNode1, ProcessNode *procNode2);
 
     std::vector<Gtk::TreeIter> GetAllByCategory(int categoryId, bool cache = true);
     std::vector<Gtk::TreeIter> GetAllByCategoryIter(int categoryId, const Gtk::TreeNodeChildren& children);
@@ -94,8 +108,8 @@ private:
     std::optional<Gtk::TreeIter> GetRowByPid(int categoryId, int pid);
     bool IsCategory(const Gtk::TreeIter& row);
 
+    // Tree view
     Gtk::ScrolledWindow m_ScrolledWindow;
-
     Gtk::TreeView m_ProcessTreeView;
     Glib::RefPtr<Gtk::TreeStore> m_ProcessTreeModel;
     ProcessesTreeModelColumns m_ProcessTreeModelColumns;
@@ -118,6 +132,9 @@ private:
 
     // Cache
     std::map<int, std::vector<Gtk::TreeIter>> m_CategoryCache;
+
+    ProcessViewColumn m_SortColumn = ProcessViewColumn::NAME;
+    bool m_SortOrder = false;
 
     ProcessNode *m_AppProcesses{};
     ProcessNode *m_WineProcesses{};

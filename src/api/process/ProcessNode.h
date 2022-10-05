@@ -45,8 +45,8 @@ public:
 
     double CalculateCPUUsageSums();
     long CalculateRAMUsageSums();
+    long CalculateDiskUsageSums();
     long CalculateGPUUsageSums();
-    void SortTree();
 
     static void Reduce(std::vector<ProcessNode *>& procList, const std::vector<ProcessNode *>& toRemove);
 

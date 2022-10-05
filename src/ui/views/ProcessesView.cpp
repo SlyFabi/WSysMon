@@ -78,15 +78,36 @@ ProcessesView::ProcessesView(MainWindow *window)
     (*m_CategorySystem)[m_ProcessTreeModelColumns.m_Name] = "System";
 
     m_ProcessTreeModelColumns.CreateColumns(m_ProcessTreeView);
+    m_ProcessTreeView.set_headers_clickable(true);
 
-    // Make resizable
+    // Make resizable and sortable
     for(int i = 0; i < m_ProcessTreeView.get_n_columns(); i++) {
         auto col = m_ProcessTreeView.get_column(i);
         col->set_resizable(true);
-        if(i == 0)
+        if(i == 0) {
             col->set_min_width(200);
+            col->set_sort_indicator(true);
+            col->set_sort_order(Gtk::SortType::SORT_ASCENDING);
+        }
         else
             col->set_min_width(50);
+
+        col->signal_clicked().connect([this, col, i]() {
+            auto newCol = static_cast<ProcessViewColumn>(i);
+            if(newCol == m_SortColumn) {
+                m_SortOrder = !m_SortOrder;
+            }
+
+            m_SortColumn = newCol;
+            for(int j = 0; j < m_ProcessTreeView.get_n_columns(); j++)
+                m_ProcessTreeView.get_column(j)->set_sort_indicator(false);
+
+            col->set_sort_indicator(true);
+            col->set_sort_order(static_cast<Gtk::SortType>(m_SortOrder));
+
+            MarkDirty();
+            spdlog::debug("Sort mode: {}", m_SortColumn);
+        });
     }
 
     // Render handler
@@ -177,7 +198,7 @@ ProcessesView::ProcessesView(MainWindow *window)
             m_UpdateThread->Dispatch();
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }, [this]() {
-            if(m_TreeDirty) {
+            if(m_TreeDirty || m_SortColumn != ProcessViewColumn::NAME) {
                 Clear();
                 m_TreeDirty = false;
             }
@@ -366,12 +387,15 @@ void ProcessesView::UpdateCategoryProcess(int categoryId, ProcessNode *procNode)
 }
 
 Gtk::TreeIter ProcessesView::AddProcess(int categoryId, ProcessNode *procNode, std::optional<Gtk::TreeIter> parent) {
-    Gtk::TreeIter rowToInsert;
-    Gtk::TreeIter newRow;
+    Gtk::TreeIter newRow{};
     if(parent != std::nullopt) {
-        rowToInsert = parent.value();
-        auto realRow = (*rowToInsert);
-        newRow = m_ProcessTreeModel->append(realRow.children());
+        auto row = GetSortedInsertionRow(procNode, parent.value());
+        GtkTreeIter *sibling = nullptr;
+        if(row.has_value())
+            sibling = row.value().gobj();
+
+        gtk_tree_store_insert_after(m_ProcessTreeModel->gobj(), newRow.gobj(), parent.value().gobj(), sibling);
+        newRow.set_model_refptr(m_ProcessTreeView.get_model());
         m_CategoryCache[categoryId].push_back(*newRow);
     } else {
         auto row = GetSortedInsertionRow(categoryId, procNode);
@@ -391,8 +415,6 @@ Gtk::TreeIter ProcessesView::AddProcess(int categoryId, ProcessNode *procNode, s
 Gtk::TreeIter ProcessesView::GetSortedInsertionRow(int categoryId, ProcessNode *procNode) {
     auto categoryRows = GetAllByCategory(categoryId, false);
     auto insertIter = std::optional<Gtk::TreeIter>();
-
-    auto procNodeName = Utils::stringToLower(procNode->GetName());
     for(const auto& iter : categoryRows) {
         const auto& row = *iter;
         if(row.parent())
@@ -400,9 +422,7 @@ Gtk::TreeIter ProcessesView::GetSortedInsertionRow(int categoryId, ProcessNode *
 
         auto pid = (int)row.get_value(m_ProcessTreeModelColumns.m_Pid);
         auto proc = ProcessManager::GetProcessByPid(pid);
-
-        auto procName = Utils::stringToLower(proc->GetName());
-        if(procNodeName.compare(procName) >= 0) {
+        if(SortCompare(procNode, proc)) {
             insertIter = iter;
         }
     }
@@ -430,6 +450,57 @@ Gtk::TreeIter ProcessesView::GetSortedInsertionRow(int categoryId, ProcessNode *
     }
 
     return rowToInsert;
+}
+
+std::optional<Gtk::TreeIter> ProcessesView::GetSortedInsertionRow(ProcessNode *procNode, const Gtk::TreeIter& parent) {
+    auto insertIter = std::optional<Gtk::TreeIter>();
+    for(const auto& row : parent->children()) {
+        auto pid = (int)row.get_value(m_ProcessTreeModelColumns.m_Pid);
+        auto proc = ProcessManager::GetProcessByPid(pid);
+        if(SortCompare(procNode, proc)) {
+            insertIter = row;
+        }
+    }
+
+    return insertIter;
+}
+
+bool ProcessesView::SortCompare(ProcessNode *procNode1, ProcessNode *procNode2) {
+    bool result = false;
+    switch(m_SortColumn) {
+        case ProcessViewColumn::CPU_USAGE: {
+            result = procNode1->GetCPUUsage() > procNode2->GetCPUUsage();
+            break;
+        }
+        case ProcessViewColumn::RAM_USAGE: {
+            result = procNode1->GetRAMUsage() > procNode2->GetRAMUsage();
+            break;
+        }
+        case ProcessViewColumn::DISK_USAGE: {
+            result = procNode1->GetDiskUsage() > procNode2->GetDiskUsage();
+            break;
+        }
+        case ProcessViewColumn::GPU_MEM_USAGE: {
+            result = procNode1->GetGPUInfo().memoryUsage > procNode2->GetGPUInfo().memoryUsage;
+            break;
+        }
+        case ProcessViewColumn::PID: {
+            result = procNode1->GetPid() > procNode2->GetPid();
+            break;
+        }
+
+        default:
+        case ProcessViewColumn::NAME: {
+            auto procName1 = Utils::stringToLower(procNode1->GetName());
+            auto procName2 = Utils::stringToLower(procNode2->GetName());
+            result = procName1.compare(procName2) >= 0;
+            break;
+        }
+    }
+
+    if(m_SortOrder)
+        return !result;
+    return result;
 }
 
 std::vector<Gtk::TreeIter> ProcessesView::GetAllByCategory(int categoryId, bool cache) {

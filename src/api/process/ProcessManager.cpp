@@ -46,8 +46,8 @@ ProcessNode *ProcessManager::GetProcessTreeByCategory(int categoryId) {
 
     root->CalculateCPUUsageSums();
     root->CalculateRAMUsageSums();
+    root->CalculateDiskUsageSums();
     root->CalculateGPUUsageSums();
-    root->SortTree();
 
     m_CategoryTreeCache[categoryId] = root;
     return root;
