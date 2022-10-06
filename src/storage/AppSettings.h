@@ -6,6 +6,9 @@
 struct Settings {
     bool displayProcList;
     bool useIECUnits;
+
+    int windowWidth;
+    int windowHeight;
 };
 
 class AppSettings {

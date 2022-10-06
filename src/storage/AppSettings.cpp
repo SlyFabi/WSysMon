@@ -22,6 +22,9 @@ Settings AppSettings::Get() {
         auto settings = Settings();
         settings.displayProcList = json["displayProcList"];
         settings.useIECUnits = json["useIECUnits"];
+
+        settings.windowWidth = json["windowWidth"];
+        settings.windowHeight = json["windowHeight"];
         return settings;
     }
     catch (...) {
@@ -31,6 +34,10 @@ Settings AppSettings::Get() {
     auto def = Settings();
     def.displayProcList = false;
     def.useIECUnits = false;
+
+    def.windowWidth = 0;
+    def.windowHeight = 0;
+
     Save(def);
     return def;
 }
@@ -43,6 +50,9 @@ void AppSettings::Save(Settings settings) {
         nlohmann::json json = {
                 {"displayProcList", settings.displayProcList},
                 {"useIECUnits", settings.useIECUnits},
+
+                {"windowWidth", settings.windowWidth},
+                {"windowHeight", settings.windowHeight},
         };
         outFile << std::setw(4) << json << std::endl;
         m_SettingsCache = settings;

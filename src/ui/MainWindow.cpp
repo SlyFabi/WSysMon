@@ -12,13 +12,31 @@ MainWindow::MainWindow(const Glib::RefPtr<Gtk::Application>& application) {
     set_default_size(0, 500);
     set_position(Gtk::WIN_POS_CENTER);
 
-    auto display = Gdk::Display::get_default();
-    if(display) {
-        auto monitor = display->get_primary_monitor();
-        if(monitor) {
-            Gdk::Rectangle screenSize;
-            monitor->get_workarea(screenSize);
-            set_default_size(0, (int)((double)screenSize.get_height() * 0.6));
+    // Save window size on exit
+    signal_delete_event().connect([this](GdkEventAny* event) {
+        int width, height;
+        get_size(width, height);
+
+        auto settings = AppSettings::Get();
+        settings.windowWidth = width;
+        settings.windowHeight = height;
+        AppSettings::Save(settings);
+        return false;
+    });
+
+    // Window size
+    auto settings = AppSettings::Get();
+    if(settings.windowWidth != 0 && settings.windowHeight != 0) {
+        set_default_size(settings.windowWidth, settings.windowHeight);
+    } else {
+        auto display = Gdk::Display::get_default();
+        if(display) {
+            auto monitor = display->get_primary_monitor();
+            if(monitor) {
+                Gdk::Rectangle screenSize;
+                monitor->get_workarea(screenSize);
+                set_default_size(0, (int)((double)screenSize.get_height() * 0.6));
+            }
         }
     }
 
