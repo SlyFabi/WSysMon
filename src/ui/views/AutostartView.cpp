@@ -8,7 +8,7 @@ AutostartView::AutostartView(MainWindow *window) : View(window) {
     m_AutostartTreeView.set_model(m_AutostartTreeModel);
 
     m_AutostartTreeView.set_activate_on_single_click(true);
-    m_AutostartTreeView.signal_row_activated().connect_notify(sigc::mem_fun(*this, &AutostartView::OnRowActivated), false);
+    m_AutostartTreeView.signal_cursor_changed().connect_notify(sigc::mem_fun(*this, &AutostartView::OnRowSelected), false);
     m_AutostartTreeView.signal_button_release_event().connect_notify(sigc::mem_fun(*this, &AutostartView::OnRowClick), false);
     m_AutostartTreeModelColumns.CreateColumns(m_AutostartTreeView);
 
@@ -90,7 +90,7 @@ Gtk::Widget &AutostartView::GetRootWidget() {
     return m_Root;
 }
 
-void AutostartView::OnRowActivated(const Gtk::TreeModel::Path &path, Gtk::TreeViewColumn *column) {
+void AutostartView::OnRowSelected() {
     m_EnableButton.set_sensitive(false);
     auto iter = GetSelectedIter();
     if(!iter.has_value())

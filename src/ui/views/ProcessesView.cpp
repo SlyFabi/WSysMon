@@ -15,15 +15,26 @@ ProcessesView::ProcessesView(MainWindow *window)
     m_ProcessTreeView.set_model(m_ProcessTreeModel);
 
     m_ProcessTreeView.set_activate_on_single_click(true);
-    m_ProcessTreeView.signal_row_activated().connect_notify(sigc::mem_fun(*this, &ProcessesView::OnRowActivated), false);
+    m_ProcessTreeView.signal_cursor_changed().connect_notify(sigc::mem_fun(*this, &ProcessesView::OnRowSelected), false);
     m_ProcessTreeView.signal_button_release_event().connect_notify(sigc::mem_fun(*this, &ProcessesView::OnRowClick), false);
+    m_ProcessTreeView.signal_key_release_event().connect_notify([this](GdkEventKey *event) {
+        auto iter = GetSelectedIter();
+        if(!iter.has_value())
+            return;
+
+        if(event->keyval == GDK_KEY_Right) {
+            m_ProcessTreeView.expand_row(m_ProcessTreeModel->get_path(iter.value()), false);
+        } else if(event->keyval == GDK_KEY_Left) {
+            m_ProcessTreeView.collapse_row(m_ProcessTreeModel->get_path(iter.value()));
+        }
+    });
 
     // Menu
     m_Window->GetApp()->add_action("processesView.endTask", sigc::mem_fun(*this, &ProcessesView::OnActionEndTask));
-    m_Window->GetApp()->set_accel_for_action("processesView.endTask", "<Primary>t");
+    m_Window->GetApp()->set_accel_for_action("app.processesView.endTask", "<Primary>t");
 
     m_Window->GetApp()->add_action("processesView.killTask", sigc::mem_fun(*this, &ProcessesView::OnActionKillTask));
-    m_Window->GetApp()->set_accel_for_action("processesView.killTask", "<Primary>k");
+    m_Window->GetApp()->set_accel_for_action("app.processesView.killTask", "<Primary>k");
 
     m_Window->GetApp()->add_action("processesView.properties", sigc::mem_fun(*this, &ProcessesView::OnActionProcessProperties));
 
@@ -34,10 +45,12 @@ ProcessesView::ProcessesView(MainWindow *window)
             "      <item>"
             "        <attribute name='label' translatable='yes'>End Task</attribute>"
             "        <attribute name='action'>app.processesView.endTask</attribute>"
+            "        <attribute name='accel'>&lt;Primary&gt;t</attribute>"
             "      </item>"
             "      <item>"
             "        <attribute name='label' translatable='yes'>Kill Task</attribute>"
             "        <attribute name='action'>app.processesView.killTask</attribute>"
+            "        <attribute name='accel'>&lt;Primary&gt;k</attribute>"
             "      </item>"
             "      <item>"
             "        <attribute name='label' translatable='yes'>Properties</attribute>"
@@ -277,7 +290,7 @@ void ProcessesView::OnActionProcessProperties() {
     }
 }
 
-void ProcessesView::OnRowActivated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn *column) {
+void ProcessesView::OnRowSelected() {
     auto iter = GetSelectedIter();
     m_KillButton.set_sensitive(iter != std::nullopt && !IsCategory(iter.value()));
 }

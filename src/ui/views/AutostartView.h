@@ -38,7 +38,7 @@ public:
 private:
     void LoadData();
 
-    void OnRowActivated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn *column);
+    void OnRowSelected();
     void OnRowClick(GdkEventButton *button);
 
     void OnEnableClick(GdkEventButton *button);

@@ -90,7 +90,7 @@ public:
     void UpdateCategory(int categoryId, ProcessNode *procRoot);
 
 private:
-    void OnRowActivated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn *column);
+    void OnRowSelected();
     void OnRowClick(GdkEventButton *button);
     void OnKillClick(GdkEventButton *button);
 
