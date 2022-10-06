@@ -2,8 +2,10 @@
 #include "../../api/GPUApi.h"
 #include "../../api/DiskApi.h"
 #include "../../api/NetworkApi.h"
+#include "../../api/HwMonApi.h"
 #include "performance/PerformanceNetworkView.h"
 #include "performance/PerformanceDiskView.h"
+#include "performance/PerformancePSUView.h"
 
 PerformanceView::PerformanceView(MainWindow *window)
     : View(window) {
@@ -52,6 +54,18 @@ PerformanceView::PerformanceView(MainWindow *window)
     for(int i = 0; i < numGpus; i++) {
         auto button = CreateButton();
         auto view = new PerformanceGPUView(window, button, i);
+        CreateView(button, view);
+    }
+
+    // PSUs
+    int numHwMon = HwMonApi::GetNumDevices();
+    for(int i = 0; i < numHwMon; i++) {
+        auto name = HwMonApi::GetDeviceName(i);
+        if(name != "corsairpsu")
+            continue;
+
+        auto button = CreateButton();
+        auto view = new PerformancePSUView(window, button, i);
         CreateView(button, view);
     }
 
