@@ -25,6 +25,7 @@ public:
     static void ClearCache();
     static ProcessNode *GetProcessTreeByCategory(int categoryId);
     static ProcessNode *GetProcessByPid(int pid);
+    static ProcessNode *GetTreeProcessByPid(int pid);
 
     static void KillByPid(int pid, bool force = false);
 private:
@@ -41,6 +42,7 @@ private:
     static std::vector<ProcessNode *> m_AllProcessesCache;
     static std::map<int, std::vector<ProcessNode *>> m_CategoryCache;
     static std::map<int, ProcessNode *> m_CategoryTreeCache;
+    static std::vector<ProcessNode *> m_TreeProcessesCache;
 
     static std::map<int, ProcessCPUTimes> m_PidCpuTimes;
     static std::map<int, ProcessIOUsage> m_PidIOUsages;

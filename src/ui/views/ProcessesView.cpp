@@ -448,7 +448,7 @@ Gtk::TreeIter ProcessesView::GetSortedInsertionRow(int categoryId, ProcessNode *
             continue;
 
         auto pid = (int)row.get_value(m_ProcessTreeModelColumns.m_Pid);
-        auto proc = ProcessManager::GetProcessByPid(pid);
+        auto proc = ProcessManager::GetTreeProcessByPid(pid);
         if(SortCompare(procNode, proc)) {
             insertIter = iter;
         }
@@ -483,7 +483,7 @@ std::optional<Gtk::TreeIter> ProcessesView::GetSortedInsertionRow(ProcessNode *p
     auto insertIter = std::optional<Gtk::TreeIter>();
     for(const auto& row : parent->children()) {
         auto pid = (int)row.get_value(m_ProcessTreeModelColumns.m_Pid);
-        auto proc = ProcessManager::GetProcessByPid(pid);
+        auto proc = ProcessManager::GetTreeProcessByPid(pid);
         if(SortCompare(procNode, proc)) {
             insertIter = row;
         }

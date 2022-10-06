@@ -8,6 +8,7 @@
 std::vector<ProcessNode *> ProcessManager::m_AllProcessesCache;
 std::map<int, std::vector<ProcessNode *>> ProcessManager::m_CategoryCache;
 std::map<int, ProcessNode *> ProcessManager::m_CategoryTreeCache;
+std::vector<ProcessNode *> ProcessManager::m_TreeProcessesCache;
 
 std::map<int, ProcessCPUTimes> ProcessManager::m_PidCpuTimes;
 std::map<int, ProcessIOUsage> ProcessManager::m_PidIOUsages;
@@ -30,6 +31,7 @@ void ProcessManager::ClearCache() {
     m_AllProcessesCache.clear();
     m_CategoryCache.clear();
     m_CategoryTreeCache.clear();
+    m_TreeProcessesCache.clear();
 }
 
 ProcessNode *ProcessManager::GetProcessTreeByCategory(int categoryId) {
@@ -50,11 +52,20 @@ ProcessNode *ProcessManager::GetProcessTreeByCategory(int categoryId) {
     root->CalculateGPUUsageSums();
 
     m_CategoryTreeCache[categoryId] = root;
+    auto flatCache = root->FlatTree();
+    m_TreeProcessesCache.insert(m_TreeProcessesCache.end(), flatCache.begin(), flatCache.end());
     return root;
 }
 
 ProcessNode *ProcessManager::GetProcessByPid(int pid) {
     for(auto node : m_AllProcessesCache)
+        if(node->GetPid() == pid)
+            return node;
+    return nullptr;
+}
+
+ProcessNode *ProcessManager::GetTreeProcessByPid(int pid) {
+    for(auto node : m_TreeProcessesCache)
         if(node->GetPid() == pid)
             return node;
     return nullptr;
