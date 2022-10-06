@@ -33,7 +33,7 @@ Settings AppSettings::Get() {
 
     auto def = Settings();
     def.displayProcList = false;
-    def.useIECUnits = false;
+    def.useIECUnits = true;
 
     def.windowWidth = 0;
     def.windowHeight = 0;
