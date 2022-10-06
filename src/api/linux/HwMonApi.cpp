@@ -5,6 +5,9 @@
 std::map<int, std::string> g_HwMonMap;
 
 int HwMonApi::GetNumDevices() {
+    if(!std::filesystem::exists("/sys/class/hwmon"))
+        return 0;
+
     int count = 0;
     for (const auto& dirEntry : std::filesystem::directory_iterator("/sys/class/hwmon")) {
         g_HwMonMap[count] = dirEntry.path().string();

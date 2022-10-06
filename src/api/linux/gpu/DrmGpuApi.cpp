@@ -5,8 +5,10 @@
 std::map<int, std::string> g_DrmGpuMap;
 
 int DrmGpuApi::GetNumGPUs() {
-    std::regex entryRegex(R"(card(\d+))");
+    if(!std::filesystem::exists("/sys/class/drm"))
+        return 0;
 
+    std::regex entryRegex(R"(card(\d+))");
     int count = 0;
     for (const auto& dirEntry : std::filesystem::directory_iterator("/sys/class/drm")) {
         std::smatch matches;

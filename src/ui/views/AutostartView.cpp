@@ -42,7 +42,6 @@ AutostartView::AutostartView(MainWindow *window) : View(window) {
 
     m_EnableButton = Gtk::Button("Enable");
     m_EnableButton.signal_button_press_event().connect_notify(sigc::mem_fun(*this, &AutostartView::OnEnableClick), false);
-    m_EnableButton.set_alignment(1, 0);
     m_EnableButton.set_sensitive(false);
     m_ButtonBox.pack_end(m_EnableButton, Gtk::PackOptions::PACK_SHRINK);
 

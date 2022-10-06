@@ -6,6 +6,7 @@ PerformanceButton::PerformanceButton(int viewId)
     m_ViewId = viewId;
     m_Graph = new GraphWidget(0, 100, 60);
     m_Graph->SetDrawAxisText(false);
+    m_Graph->SetMargin(0, 0);
 
     set_has_window(true);
 }

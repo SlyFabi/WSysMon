@@ -23,7 +23,7 @@ public:
     void SetAxisColor(const Gdk::RGBA& color);
     void SetSecondaryColor(const Gdk::RGBA& color);
 
-    void SetMargin(int margin);
+    void SetMargin(int marginH, int marginV);
     void SetDrawAxisText(bool draw);
 
     void SetSize(int width, int height);
@@ -63,7 +63,7 @@ private:
     double m_MaxValue;
     double m_TimespanSeconds;
 
-    int m_Margin;
+    int m_MarginH, m_MarginV;
     bool m_DrawAxisText{};
     std::string m_AxisUnit;
 

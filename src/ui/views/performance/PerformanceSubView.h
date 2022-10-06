@@ -15,10 +15,7 @@ public:
         m_UsageGraph = widget;
 
         m_UsageGraph->SetSize(800, 400);
-        m_UsageGraph->SetMargin(20);
 
-        //m_UsageGraphBox.set_halign(Gtk::ALIGN_FILL);
-       // m_UsageGraphBox.set_valign(Gtk::ALIGN_FILL);
         m_UsageGraphBox.set_selection_mode(Gtk::SELECTION_NONE);
         m_UsageGraphBox.set_homogeneous(true);
 
@@ -111,7 +108,7 @@ public:
         m_DetailFlowBox.add(*box);
     }
 
-    void AddDetail(std::string name, Gtk::Label &label) {
+    void AddDetail(const std::string& name, Gtk::Label &label) {
         auto box = new Gtk::Box();
         box->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
         box->set_homogeneous(true);

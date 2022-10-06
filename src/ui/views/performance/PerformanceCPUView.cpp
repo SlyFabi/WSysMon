@@ -38,7 +38,7 @@ PerformanceCPUView::PerformanceCPUView(MainWindow *window, PerformanceButton *bu
     for(int i = 0; i < SystemInfoApi::GetNumCPUsLogical(); i++) {
         auto graph = new GraphWidget(0, 100, 30);
         graph->SetSize(140, 180);
-        graph->SetMargin(10);
+        graph->SetMargin(10, 10);
         graph->SetDrawAxisText(false);
         graph->signal_button_press_event().connect(sigc::mem_fun(*this, &PerformanceCPUView::OnGraphClick));
         m_CpuGraphs[i] = graph;

@@ -8,7 +8,8 @@ GraphWidget::GraphWidget(double minValue, double maxValue, double timespanSecond
     m_MinValue = minValue;
     m_MaxValue = maxValue;
     m_TimespanSeconds = timespanSeconds;
-    m_Margin = 0;
+    m_MarginH = 15;
+    m_MarginV = 25;
     m_DrawAxisText = true;
 
     m_AxisColor.set_rgba(74 / 256., 120 / 256., 149 / 256., 1);
@@ -57,8 +58,9 @@ void GraphWidget::SetSecondaryColor(const Gdk::RGBA& color) {
     m_SecondaryColor = color;
 }
 
-void GraphWidget::SetMargin(int margin) {
-    m_Margin = margin;
+void GraphWidget::SetMargin(int marginH, int marginV) {
+    m_MarginH = marginH;
+    m_MarginV = marginV;
 }
 
 void GraphWidget::SetDrawAxisText(bool draw) {
@@ -154,8 +156,6 @@ void GraphWidget::on_realize() {
 
 void GraphWidget::on_unrealize() {
     m_refGdkWindow.reset();
-
-    //Call base class:
     Gtk::Widget::on_unrealize();
 }
 
@@ -169,14 +169,13 @@ bool GraphWidget::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
 }
 
 void GraphWidget::Draw(const Cairo::RefPtr<Cairo::Context> &cr, GdkRectangle root) {
-    auto margin = m_Margin;
     GdkRectangle plotArea;
-    plotArea.x = root.x + margin;
-    plotArea.y = root.y + margin;
-    plotArea.width = root.width - margin * 2;
-    plotArea.height = root.height - margin * 2;
+    plotArea.x = root.x + m_MarginH;
+    plotArea.y = root.y + m_MarginV;
+    plotArea.width = root.width - m_MarginH * 2;
+    plotArea.height = root.height - m_MarginV * 2;
 
-    // paint the background
+    // Draw background
     Gdk::RGBA background;
     background.set_rgba(0., 0., 0., 0.);
     Gdk::Cairo::set_source_rgba(cr, background);
@@ -186,7 +185,7 @@ void GraphWidget::Draw(const Cairo::RefPtr<Cairo::Context> &cr, GdkRectangle roo
         get_style_context()->lookup_color("theme_bg_color", background);
 
     Gdk::Cairo::set_source_rgba(cr, background);
-    cr->rectangle(plotArea.x, plotArea.y, plotArea.width, plotArea.height);
+    cr->rectangle(root.x, root.y, root.width, root.height);
     cr->fill();
 
     // Draw points
@@ -218,26 +217,24 @@ void GraphWidget::Draw(const Cairo::RefPtr<Cairo::Context> &cr, GdkRectangle roo
         int textHeight;
         pangoLayout->get_pixel_size(textWidth, textHeight);
 
-        auto textOffset = 25;
         pangoLayout->set_text(m_AxisUnit);
         pangoLayout->get_pixel_size(textWidth, textHeight);
-        cr->move_to(plotArea.x, plotArea.y - textOffset / 2. - textHeight / 2.);
+        cr->move_to(root.x + m_MarginH, root.y);
         pangoLayout->show_in_cairo_context(cr);
 
         pangoLayout->set_text(std::to_string((int)m_MaxValue));
         pangoLayout->get_pixel_size(textWidth, textHeight);
-        cr->move_to(plotArea.x + plotArea.width - textWidth, plotArea.y - textOffset / 2. - textHeight / 2.);
+        cr->move_to(root.x + root.width - m_MarginH - textWidth, root.y);
         pangoLayout->show_in_cairo_context(cr);
 
-        textOffset = 15;
         pangoLayout->set_text(fmt::format("{} Seconds", (int)m_TimespanSeconds));
         pangoLayout->get_pixel_size(textWidth, textHeight);
-        cr->move_to(plotArea.x, plotArea.y + plotArea.height + textOffset - textHeight / 2.);
+        cr->move_to(root.x + m_MarginH, root.y + root.height - textHeight);
         pangoLayout->show_in_cairo_context(cr);
 
         pangoLayout->set_text(std::to_string((int)m_MinValue));
         pangoLayout->get_pixel_size(textWidth, textHeight);
-        cr->move_to(plotArea.x + plotArea.width - textWidth, plotArea.y + plotArea.height + textOffset - textHeight / 2.);
+        cr->move_to(root.x + root.width - m_MarginH - textWidth, root.y + root.height - textHeight);
         pangoLayout->show_in_cairo_context(cr);
     }
 }

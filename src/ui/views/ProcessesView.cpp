@@ -77,7 +77,6 @@ ProcessesView::ProcessesView(MainWindow *window)
 
     m_KillButton = Gtk::Button("End task");
     m_KillButton.signal_button_press_event().connect_notify(sigc::mem_fun(*this, &ProcessesView::OnKillClick), false);
-    m_KillButton.set_alignment(1, 0);
     m_KillButton.set_sensitive(false);
 
     m_ButtonBox.pack_end(m_KillButton, Gtk::PackOptions::PACK_SHRINK);
