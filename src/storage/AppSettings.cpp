@@ -1,6 +1,6 @@
 #include "AppSettings.h"
 #include <fstream>
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include <unistd.h>
 #include <pwd.h>
 
