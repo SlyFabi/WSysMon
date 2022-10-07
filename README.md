@@ -21,6 +21,7 @@ $ sudo zypper in wsysmon
 # Building
 The following dependencies are required:
 * `libgtkmm-3.0`
+* `libsystemd`
 
 ```
 mkdir build
