@@ -11,6 +11,13 @@ On Arch based distros (AUR):
 $ yay -S wsysmon-git
 ```
 
+On openSUSE from [Vortex Acherontic´s Repo](https://build.opensuse.org/project/show/home:VortexAcherontic):
+```
+$ sudo zypper addrepo https://download.opensuse.org/repositories/home:VortexAcherontic/openSUSE_Tumbleweed/home:VortexAcherontic.repo
+$ sudo zypper ref
+$ sudo zypper in wsysmon
+```
+
 # Building
 The following dependencies are required:
 * `libgtkmm-3.0`
