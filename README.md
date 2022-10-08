@@ -24,11 +24,9 @@ The following dependencies are required:
 * `libsystemd`
 
 ```
-mkdir build
 cmake -B ./build -DCMAKE_BUILD_TYPE=Release
 cmake --build ./build --config Release
 ```
 
 # Limitations
-* Apps Category only works on X11
 * Only NVIDIA GPUs using the proprietary driver are detected
