@@ -6,6 +6,7 @@
 struct Settings {
     bool displayProcList;
     bool useIECUnits;
+    bool useX11AppDetect;
 
     int windowWidth;
     int windowHeight;

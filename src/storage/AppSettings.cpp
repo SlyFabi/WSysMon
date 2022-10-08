@@ -1,4 +1,5 @@
 #include "AppSettings.h"
+
 #include <fstream>
 #include <json.hpp>
 #include <unistd.h>
@@ -22,6 +23,7 @@ Settings AppSettings::Get() {
         auto settings = Settings();
         settings.displayProcList = json["displayProcList"];
         settings.useIECUnits = json["useIECUnits"];
+        settings.useX11AppDetect = json["useX11AppDetect"];
 
         settings.windowWidth = json["windowWidth"];
         settings.windowHeight = json["windowHeight"];
@@ -34,6 +36,7 @@ Settings AppSettings::Get() {
     auto def = Settings();
     def.displayProcList = false;
     def.useIECUnits = true;
+    def.useX11AppDetect = false;
 
     def.windowWidth = 0;
     def.windowHeight = 0;
@@ -50,6 +53,7 @@ void AppSettings::Save(Settings settings) {
         nlohmann::json json = {
                 {"displayProcList", settings.displayProcList},
                 {"useIECUnits", settings.useIECUnits},
+                {"useX11AppDetect", settings.useX11AppDetect},
 
                 {"windowWidth", settings.windowWidth},
                 {"windowHeight", settings.windowHeight},

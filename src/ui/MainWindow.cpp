@@ -80,6 +80,17 @@ MainWindow::MainWindow(const Glib::RefPtr<Gtk::Application>& application) {
     });
     m_Application->add_action(procListAction);
 
+    auto useX11Action = Gio::SimpleAction::create_bool("mainView.useX11AppDetect",
+                                                         AppSettings::Get().useX11AppDetect);
+    useX11Action->signal_activate().connect([this, useX11Action](const Glib::VariantBase& variant) {
+        auto settings = AppSettings::Get();
+        settings.useX11AppDetect = !settings.useX11AppDetect;
+        useX11Action->set_state(Glib::Variant<bool>::create(settings.useX11AppDetect));
+        AppSettings::Save(settings);
+        m_ProcessView->MarkDirty();
+    });
+    m_Application->add_action(useX11Action);
+
     auto iecAction = Gio::SimpleAction::create_bool("mainView.useIECUnits",
                                                  AppSettings::Get().useIECUnits);
     iecAction->signal_activate().connect([this, iecAction](const Glib::VariantBase& variant) {
@@ -105,6 +116,10 @@ MainWindow::MainWindow(const Glib::RefPtr<Gtk::Application>& application) {
       <item>
         <attribute name="label">Display as list</attribute>
         <attribute name="action">app.mainView.displayProcList</attribute>
+      </item>
+      <item>
+        <attribute name="label">Use X11 App detection</attribute>
+        <attribute name="action">app.mainView.useX11AppDetect</attribute>
       </item>
       <item>
         <attribute name="label">Use IEC units</attribute>

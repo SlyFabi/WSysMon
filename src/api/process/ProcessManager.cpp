@@ -1,5 +1,6 @@
 #include "ProcessManager.h"
 #include "../../utils/X11Utils.h"
+#include "../../utils/CGUtils.h"
 #include "../../storage/AppSettings.h"
 
 #include <unistd.h>
@@ -86,7 +87,13 @@ std::vector<ProcessNode *> ProcessManager::GetProcessesByCategory(int categoryId
     std::function<bool(ProcessNode *)> filterFunc;
     switch(categoryId) {
         case PROCESSES_VIEW_CATEGORY_APPS: {
-            auto windowPids = X11Utils::GetAllPidsWithWindows();
+            auto settings = AppSettings::Get();
+            std::vector<int> windowPids;
+            if(settings.useX11AppDetect)
+                windowPids = X11Utils::GetAllPidsWithWindows();
+            else
+                windowPids = CGUtils::GetAllPidsWithWindows();
+
             filterFunc = [&](ProcessNode *proc) -> bool { return proc->GetUserIds().uid == getuid() && !is_in_app_blacklist(proc) && Utils::vectorContains(windowPids, proc->GetPid()); };
             result = ProcessManager::GetProcessesByFilter(filterFunc, !AppSettings::Get().displayProcList);
             break;
