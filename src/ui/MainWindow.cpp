@@ -4,6 +4,7 @@
 #define MAIN_WINDOW_PAGE_PROCESSES "Processes"
 #define MAIN_WINDOW_PAGE_PERFORMANCE "Performance"
 #define MAIN_WINDOW_PAGE_AUTOSTART "Autostart"
+#define MAIN_WINDOW_PAGE_SERVICES "Services"
 
 MainWindow::MainWindow(const Glib::RefPtr<Gtk::Application>& application) {
     m_Application = application;
@@ -51,6 +52,10 @@ MainWindow::MainWindow(const Glib::RefPtr<Gtk::Application>& application) {
     // Autostart View
     m_AutostartView = new AutostartView(this);
     m_MainStack.add(m_AutostartView->GetRootWidget(), MAIN_WINDOW_PAGE_AUTOSTART, MAIN_WINDOW_PAGE_AUTOSTART);
+
+    // Autostart View
+    m_ServicesView = new ServicesView(this);
+    m_MainStack.add(m_ServicesView->GetRootWidget(), MAIN_WINDOW_PAGE_SERVICES, MAIN_WINDOW_PAGE_SERVICES);
 
     // Main Tabber
     m_MainTabber.set_stack(m_MainStack);
@@ -148,6 +153,7 @@ MainWindow::~MainWindow() {
     SAFE_DELETE(m_ProcessView);
     SAFE_DELETE(m_PerformanceView);
     SAFE_DELETE(m_AutostartView);
+    SAFE_DELETE(m_ServicesView);
 }
 
 void MainWindow::OnShown() {
@@ -163,12 +169,20 @@ void MainWindow::OnTabChanged() {
         m_ProcessView->OnShown();
         m_PerformanceView->OnHidden();
         m_AutostartView->OnHidden();
+        m_ServicesView->OnHidden();
     } else if(currPage == MAIN_WINDOW_PAGE_PERFORMANCE) {
         m_PerformanceView->OnShown();
         m_ProcessView->OnHidden();
         m_AutostartView->OnHidden();
+        m_ServicesView->OnHidden();
     } else if(currPage == MAIN_WINDOW_PAGE_AUTOSTART) {
         m_AutostartView->OnShown();
+        m_ProcessView->OnHidden();
+        m_PerformanceView->OnHidden();
+        m_ServicesView->OnHidden();
+    } else if(currPage == MAIN_WINDOW_PAGE_SERVICES) {
+        m_ServicesView->OnShown();
+        m_AutostartView->OnHidden();
         m_ProcessView->OnHidden();
         m_PerformanceView->OnHidden();
     }

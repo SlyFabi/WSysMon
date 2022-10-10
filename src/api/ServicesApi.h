@@ -4,7 +4,8 @@
 #include "../utils/Utils.h"
 
 struct ServiceInfo {
-
+    std::string name;
+    std::string status;
 };
 
 class ServicesApi {

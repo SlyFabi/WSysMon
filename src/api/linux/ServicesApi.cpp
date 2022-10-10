@@ -24,6 +24,7 @@ std::vector<ServiceInfo> ServicesApi::GetAllServices() {
     sd_bus_message *m = nullptr;
     sd_bus *bus = nullptr;
     sd_unit_info u{};
+    std::vector<ServiceInfo> result{};
 
     int r = sd_bus_open_system(&bus);
     if (r < 0)
@@ -49,12 +50,20 @@ std::vector<ServiceInfo> ServicesApi::GetAllServices() {
         goto end;
 
     while (parse_unit(m, &u) > 0) {
-        spdlog::debug("Unit: {}", u.id);
+        if(!Utils::stringEndsWith(u.id, ".service"))
+            continue;
+
+        auto service = ServiceInfo();
+        service.name = Utils::stringReplace(u.id, ".service", "");
+        service.status = u.sub_state;
+        result.emplace_back(service);
+
+        //spdlog::debug("{}", u.sub_state);
     }
 
     end:
     sd_bus_error_free(&error);
     sd_bus_message_unref(m);
     sd_bus_unref(bus);
-    return {};
+    return result;
 }
