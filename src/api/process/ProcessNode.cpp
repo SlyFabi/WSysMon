@@ -54,12 +54,10 @@ std::vector<ProcessNode *> ProcessNode::GetChildren() {
 }
 
 int ProcessNode::GetDepth() {
-    int depth = 0;
-    for(auto child : m_Children) {
-        depth += child->GetDepth();
-    }
+    if(m_ParentPid == -1 || m_Parent == nullptr)
+        return 0;
 
-    return depth;
+    return m_Parent->GetDepth() + 1;
 }
 
 int ProcessNode::GetPid() const {

@@ -15,6 +15,7 @@ std::map<int, ProcessCPUTimes> ProcessManager::m_PidCpuTimes;
 std::map<int, ProcessIOUsage> ProcessManager::m_PidIOUsages;
 
 std::vector<std::string> g_AppBlacklist = {"gnome-shell", "plasmashell"}; // NOLINT(cert-err58-cpp)
+std::vector<std::string> g_AppParentBlacklist = {"bash", "bwrap"};
 
 inline bool is_in_app_blacklist(ProcessNode *node) {
     return Utils::vectorContains(g_AppBlacklist, node->GetName());
@@ -95,7 +96,7 @@ std::vector<ProcessNode *> ProcessManager::GetProcessesByCategory(int categoryId
                 windowPids = CGUtils::GetAllPidsWithWindows();
 
             filterFunc = [&](ProcessNode *proc) -> bool { return proc->GetUserIds().uid == getuid() && !is_in_app_blacklist(proc) && Utils::vectorContains(windowPids, proc->GetPid()); };
-            result = ProcessManager::GetProcessesByFilter(filterFunc, !AppSettings::Get().displayProcList);
+            result = ProcessManager::GetAppProcessesByFilter(filterFunc, !AppSettings::Get().displayProcList);
             break;
         }
         case PROCESSES_VIEW_CATEGORY_WINE: {
@@ -143,6 +144,41 @@ std::vector<ProcessNode *> ProcessManager::GetProcessesByFilter(const std::funct
                 if(Utils::vectorContains(pids, child->GetPid()))
                     continue;
                 if(!withChildren && proc->GetName() != child->GetName())
+                    continue;
+
+                result.push_back(child->Copy());
+                pids.push_back(child->GetPid());
+            }
+        }
+    }
+
+    return result;
+}
+
+std::vector<ProcessNode *> ProcessManager::GetAppProcessesByFilter(const std::function<bool(ProcessNode *)>& filterFunc, bool withChildren) {
+    std::vector<ProcessNode *> result;
+    std::vector<int> pids;
+
+    auto procList = GetAllProcesses();
+    for(auto proc : procList) {
+        if(filterFunc(proc)) {
+            auto realProc = proc;
+            auto minDepth = INT32_MAX;
+            for(auto child : proc->FlatTree()) {
+                if(Utils::vectorContains(g_AppParentBlacklist, child->GetName()))
+                    continue;
+
+                auto childDepth = child->GetDepth();
+                if(childDepth < minDepth) {
+                    realProc = child;
+                    minDepth = childDepth;
+                }
+            }
+
+            for(auto child : realProc->FlatTree()) {
+                if(Utils::vectorContains(pids, child->GetPid()))
+                    continue;
+                if(!withChildren && realProc->GetName() != child->GetName())
                     continue;
 
                 result.push_back(child->Copy());

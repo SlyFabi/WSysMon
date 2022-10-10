@@ -31,6 +31,7 @@ public:
 private:
     static std::vector<ProcessNode *> GetProcessesByCategory(int categoryId);
     static std::vector<ProcessNode *> GetProcessesByFilter(const std::function<bool(ProcessNode *)>& filterFunc, bool withChildren = true);
+    static std::vector<ProcessNode *> GetAppProcessesByFilter(const std::function<bool(ProcessNode *)>& filterFunc, bool withChildren = true);
     static std::vector<ProcessNode *> GetAllProcesses();
 
     static double GetCPUUsageForProc(const ProcessInfo& proc, CPUTimes cpuTimes);
