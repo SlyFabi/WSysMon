@@ -1,5 +1,6 @@
 #include "CGUtils.h"
 
+#include "IOUtils.h"
 #include <filesystem>
 #include <unistd.h>
 
@@ -17,7 +18,11 @@ std::vector<int> CGUtils::GetAllPidsWithWindows() {
         if(!std::regex_match(nameStr, matches, entryRegex))
             continue;
 
-        result.emplace_back(Utils::stringToInt(matches[3].str()));
+        for(const auto& pidStr : IOUtils::ReadAllLines(dirEntry.path().string() + "/cgroup.procs")) {
+            auto pid = Utils::stringToInt(pidStr);
+            if(pid > 0)
+                result.emplace_back(pid);
+        }
     }
 
     return result;

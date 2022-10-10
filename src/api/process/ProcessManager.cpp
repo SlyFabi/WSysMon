@@ -14,7 +14,8 @@ std::vector<ProcessNode *> ProcessManager::m_TreeProcessesCache;
 std::map<int, ProcessCPUTimes> ProcessManager::m_PidCpuTimes;
 std::map<int, ProcessIOUsage> ProcessManager::m_PidIOUsages;
 
-std::vector<std::string> g_AppBlacklist = {"gnome-shell", "plasmashell"}; // NOLINT(cert-err58-cpp)
+std::vector<std::string> g_AppBlacklist = {"gnome-shell", "plasmashell", "evolution-alarm-notify", "gsd-disk-utility-notify",
+                                           "xdg-dbus-proxy", "mailsync.bin", "chrome_crashpad_handler"}; // NOLINT(cert-err58-cpp)
 std::vector<std::string> g_AppParentBlacklist = {"bash", "bwrap"};
 
 inline bool is_in_app_blacklist(ProcessNode *node) {
@@ -174,6 +175,9 @@ std::vector<ProcessNode *> ProcessManager::GetAppProcessesByFilter(const std::fu
                     minDepth = childDepth;
                 }
             }
+
+            if(is_in_app_blacklist(realProc))
+                continue;
 
             for(auto child : realProc->FlatTree()) {
                 if(Utils::vectorContains(pids, child->GetPid()))
