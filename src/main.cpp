@@ -1,6 +1,6 @@
 #include <gtkmm/application.h>
 #include "ui/MainWindow.h"
-#include "utils/X11Utils.h"
+#include "utils/linux/X11Utils.h"
 
 int main(int argc, char *argv[]) {
 #ifndef NDEBUG

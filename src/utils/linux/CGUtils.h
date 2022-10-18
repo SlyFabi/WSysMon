@@ -1,7 +1,7 @@
 #ifndef WSYSMON_CGUTILS_H
 #define WSYSMON_CGUTILS_H
 
-#include "Utils.h"
+#include "../Utils.h"
 
 class CGUtils {
 public:

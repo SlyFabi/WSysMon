@@ -1,10 +1,14 @@
 #include "ProcessManager.h"
-#include "../../utils/X11Utils.h"
-#include "../../utils/CGUtils.h"
+#include "../../utils/linux/X11Utils.h"
+#include "../../utils/linux/CGUtils.h"
 #include "../../storage/AppSettings.h"
 
 #include <unistd.h>
 #include <csignal>
+
+#ifdef APPLE
+#include "../../utils/macos/MacUtils.h"
+#endif
 
 std::vector<ProcessNode *> ProcessManager::m_AllProcessesCache;
 std::map<int, std::vector<ProcessNode *>> ProcessManager::m_CategoryCache;
@@ -89,12 +93,16 @@ std::vector<ProcessNode *> ProcessManager::GetProcessesByCategory(int categoryId
     std::function<bool(ProcessNode *)> filterFunc;
     switch(categoryId) {
         case PROCESSES_VIEW_CATEGORY_APPS: {
+            std::vector<int> windowPids{};
+#ifdef LINUX
             auto settings = AppSettings::Get();
-            std::vector<int> windowPids;
             if(settings.useX11AppDetect)
                 windowPids = X11Utils::GetAllPidsWithWindows();
             else
                 windowPids = CGUtils::GetAllPidsWithWindows();
+#elif APPLE
+            windowPids = MacUtils::GetAllPidsWithWindows();
+#endif
 
             filterFunc = [&](ProcessNode *proc) -> bool { return proc->GetUserIds().uid == getuid() && !is_in_app_blacklist(proc) && Utils::vectorContains(windowPids, proc->GetPid()); };
             result = ProcessManager::GetAppProcessesByFilter(filterFunc, !AppSettings::Get().displayProcList);
@@ -203,7 +211,9 @@ std::vector<ProcessNode *> ProcessManager::GetAllProcesses() {
     auto procList = ProcessesApi::GetAllProcesses();
     auto cpuTimes = SystemInfoApi::GetCPUTimes(-1);
 
+#ifdef LINUX
     auto nvidiaInfo = NvGpuApi::GetInfo();
+#endif
     for(const auto& proc : procList) {
         auto cpuUsage = GetCPUUsageForProc(proc, cpuTimes);
         auto ioUsage = GetIOUsageForProc(proc);
@@ -212,8 +222,10 @@ std::vector<ProcessNode *> ProcessManager::GetAllProcesses() {
         details.path = proc.path;
 
         GPUProcessInfo gpuInfo{};
+#ifdef LINUX
         if(nvidiaInfo.has_value())
             gpuInfo = GPUApi::GetGPUProcessInfo(nvidiaInfo.value(), 0, proc.pid);
+#endif
 
         auto node = new ProcessNode(proc.pid, proc.parentPid, proc.name, "", proc.uids, details,
                                     cpuUsage, proc.memoryUsageBytes, ioUsage.diskUsageBytes, 0,
