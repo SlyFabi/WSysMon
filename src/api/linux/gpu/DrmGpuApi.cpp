@@ -57,13 +57,20 @@ long DrmGpuApi::GetGPUUsedMemory(int gpuId) {
 
 long DrmGpuApi::GetGPUClock(int gpuId) {
     auto hwMonDir = g_DrmGpuMap[gpuId] + "/hwmon";
-    if(!std::filesystem::exists(hwMonDir))
-        return 0;
-
-    for (const auto& dirEntry : std::filesystem::directory_iterator(hwMonDir)) {
-        auto inputPath = dirEntry.path().string() + "/freq1_input";
-        if(std::filesystem::exists(inputPath))
-            return Utils::stringToLong(IOUtils::ReadAllText(inputPath));
+    //hwmon for some AMD apu is present at /device/hwmon
+    auto hwMonDevDir = g_DrmGpuMap[gpuId] + "/device/hwmon";
+    if(std::filesystem::exists(hwMonDir)) {
+        for (const auto &dirEntry: std::filesystem::directory_iterator(hwMonDir)) {
+            auto inputPath = dirEntry.path().string() + "/freq1_input";
+            if (std::filesystem::exists(inputPath))
+                return Utils::stringToLong(IOUtils::ReadAllText(inputPath));
+        }
+    } else if(std::filesystem::exists(hwMonDevDir)) {
+        for (const auto &dirEntry: std::filesystem::directory_iterator(hwMonDevDir)) {
+            auto inputPath = dirEntry.path().string() + "/freq1_input";
+            if (std::filesystem::exists(inputPath))
+                return Utils::stringToLong(IOUtils::ReadAllText(inputPath));
+        }
     }
     return 0;
 }
@@ -75,13 +82,21 @@ double DrmGpuApi::GetGPUUsagePercent(int gpuId) {
 
 double DrmGpuApi::GetGPUTemperature(int gpuId) {
     auto hwMonDir = g_DrmGpuMap[gpuId] + "/hwmon";
-    if(!std::filesystem::exists(hwMonDir))
+    //hwmon for some AMD apu is present at /device/hwmon
+    auto hwMonDevDir = g_DrmGpuMap[gpuId] + "/device/hwmon";
+    if(std::filesystem::exists(hwMonDir)) {
+        for (const auto &dirEntry: std::filesystem::directory_iterator(hwMonDir)) {
+            auto inputPath = dirEntry.path().string() + "/temp1_input";
+            if (std::filesystem::exists(inputPath))
+                return Utils::stringToDouble(IOUtils::ReadAllText(inputPath));
+        }
+    } else if(std::filesystem::exists(hwMonDevDir)) {
+        for (const auto &dirEntry: std::filesystem::directory_iterator(hwMonDevDir)) {
+            auto inputPath = dirEntry.path().string() + "/temp1_input";
+            if (std::filesystem::exists(inputPath))
+                return Utils::stringToDouble(IOUtils::ReadAllText(inputPath))/1000;
+        }
+    } else {
         return 0;
-
-    for (const auto& dirEntry : std::filesystem::directory_iterator(hwMonDir)) {
-        auto inputPath = dirEntry.path().string() + "/temp1_input";
-        if(std::filesystem::exists(inputPath))
-            return Utils::stringToDouble(IOUtils::ReadAllText(inputPath));
     }
-    return 0;
 }
